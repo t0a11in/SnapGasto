@@ -1,0 +1,10 @@
+# Excluye secretos, artefactos y archivos de desarrollo del contexto Docker.
+.git
+.gitignore
+.mvn
+target
+.env
+.env.*
+!.env.example
+HELP.md
+database

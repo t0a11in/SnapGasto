@@ -1,0 +1,26 @@
+# Ejecuta solamente la API; SQL Server permanece en el equipo anfitrión.
+name: snapgasto
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: snapgasto-api
+    ports:
+      - "${API_PORT:-8080}:8080"
+    environment:
+      # Docker Desktop resuelve este host hacia el equipo donde está SQL Server.
+      DB_HOST: host.docker.internal
+      DB_PORT: ${DB_PORT:-1433}
+      DB_NAME: ${DB_NAME:-snap_gastos}
+      DB_USER: ${DB_USER:-sa}
+      DB_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en .env o en el entorno}
+      JWT_SECRET: ${JWT_SECRET:?Define JWT_SECRET en .env o en el entorno}
+      JWT_EXPIRATION_MINUTES: ${JWT_EXPIRATION_MINUTES:-120}
+      APP_BOOTSTRAP_ADMIN_EMAIL: ${APP_BOOTSTRAP_ADMIN_EMAIL:-}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:*,http://127.0.0.1:*}
+      SERVER_PORT: 8080
+    # Mantiene la conectividad también en Docker Engine sobre Linux.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
