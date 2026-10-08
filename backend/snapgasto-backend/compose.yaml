@@ -19,6 +19,8 @@ services:
       JWT_SECRET: ${JWT_SECRET:?Define JWT_SECRET en .env o en el entorno}
       JWT_EXPIRATION_MINUTES: ${JWT_EXPIRATION_MINUTES:-120}
       APP_BOOTSTRAP_ADMIN_EMAIL: ${APP_BOOTSTRAP_ADMIN_EMAIL:-}
+      FIREBASE_ENABLED: ${FIREBASE_ENABLED:-false}
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:-}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:*,http://127.0.0.1:*}
       SERVER_PORT: 8080
     # Mantiene la conectividad también en Docker Engine sobre Linux.

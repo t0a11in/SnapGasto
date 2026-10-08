@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cl.snapgasto.backend.dto.AuthRequest;
 import cl.snapgasto.backend.dto.AuthResponse;
+import cl.snapgasto.backend.dto.FirebaseLoginRequest;
 import cl.snapgasto.backend.dto.RegisterRequest;
 import cl.snapgasto.backend.service.AuthService;
 import jakarta.validation.Valid;
@@ -33,5 +34,10 @@ public class AuthController {
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody AuthRequest request) {
         return authService.login(request);
+    }
+
+    @PostMapping("/google")
+    public AuthResponse loginWithGoogle(@Valid @RequestBody FirebaseLoginRequest request) {
+        return authService.loginWithGoogle(request);
     }
 }

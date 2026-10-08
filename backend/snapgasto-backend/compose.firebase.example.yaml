@@ -1,0 +1,11 @@
+# Uso: copia este archivo como compose.firebase.yaml, guarda dentro de secrets/
+# la cuenta de servicio descargada desde Firebase y ejecuta:
+# docker compose -f compose.yaml -f compose.firebase.yaml up --build -d
+services:
+  api:
+    environment:
+      FIREBASE_ENABLED: "true"
+      FIREBASE_PROJECT_ID: "reemplaza-por-tu-project-id"
+      GOOGLE_APPLICATION_CREDENTIALS: "/run/secrets/firebase-service-account.json"
+    volumes:
+      - ./secrets/firebase-service-account.json:/run/secrets/firebase-service-account.json:ro

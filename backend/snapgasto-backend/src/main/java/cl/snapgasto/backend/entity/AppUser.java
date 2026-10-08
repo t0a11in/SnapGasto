@@ -43,6 +43,10 @@ public class AppUser implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    /** UID inmutable emitido por Firebase para una cuenta vinculada a Google. */
+    @Column(name = "firebase_uid", length = 128)
+    private String firebaseUid;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Role role = Role.USER;

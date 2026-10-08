@@ -12,6 +12,8 @@ import cl.snapgasto.backend.entity.AppUser;
 public interface UserRepository extends JpaRepository<AppUser, UUID> {
     Optional<AppUser> findByEmailIgnoreCase(String email);
 
+    Optional<AppUser> findByFirebaseUid(String firebaseUid);
+
     boolean existsByEmailIgnoreCase(String email);
 
     boolean existsByEmailIgnoreCaseAndIdNot(String email, UUID id);

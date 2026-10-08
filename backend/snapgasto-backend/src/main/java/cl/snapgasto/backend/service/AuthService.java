@@ -11,11 +11,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import cl.snapgasto.backend.dto.AuthRequest;
 import cl.snapgasto.backend.dto.AuthResponse;
+import cl.snapgasto.backend.dto.FirebaseLoginRequest;
 import cl.snapgasto.backend.dto.RegisterRequest;
 import cl.snapgasto.backend.dto.UserResponse;
 import cl.snapgasto.backend.entity.AppUser;
 import cl.snapgasto.backend.entity.Role;
 import cl.snapgasto.backend.repository.UserRepository;
+import cl.snapgasto.backend.security.FirebaseIdentity;
+import cl.snapgasto.backend.security.FirebaseTokenVerifier;
 import cl.snapgasto.backend.security.JwtService;
 
 /** Implementa registro y acceso con contraseña BCrypt para el MVP. */
@@ -25,16 +28,19 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final FirebaseTokenVerifier firebaseTokenVerifier;
     private final String bootstrapAdminEmail;
 
     public AuthService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
+            FirebaseTokenVerifier firebaseTokenVerifier,
             @Value("${app.bootstrap.admin-email:}") String bootstrapAdminEmail) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.firebaseTokenVerifier = firebaseTokenVerifier;
         this.bootstrapAdminEmail = bootstrapAdminEmail;
     }
 
@@ -60,6 +66,34 @@ public class AuthService {
             throw invalidCredentials();
         }
         return responseFor(user);
+    }
+
+    /**
+     * Vincula una identidad Google verificada por Firebase con una cuenta local
+     * y entrega el mismo JWT que consume el resto de la API.
+     */
+    @Transactional
+    public AuthResponse loginWithGoogle(FirebaseLoginRequest request) {
+        FirebaseIdentity identity = firebaseTokenVerifier.verifyGoogleToken(request.idToken());
+        AppUser user = userRepository.findByFirebaseUid(identity.uid())
+                .orElseGet(() -> userRepository.findByEmailIgnoreCase(identity.email()).orElse(null));
+
+        if (user == null) {
+            user = new AppUser();
+            user.setEmail(identity.email());
+            user.setFullName(identity.displayName());
+            // La cuenta Google no tiene contraseña local. Se conserva una clave
+            // BCrypt aleatoria para mantener la columna no nula y no habilitar
+            // acceso por contraseña sin que el usuario la cree explícitamente.
+            user.setPassword(passwordEncoder.encode(java.util.UUID.randomUUID().toString()));
+            user.setRole(isBootstrapAdmin(identity.email()) ? Role.ADMIN : Role.USER);
+        } else if (user.getFirebaseUid() != null && !user.getFirebaseUid().equals(identity.uid())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Este correo ya está vinculado a otra cuenta Google.");
+        }
+
+        user.setFirebaseUid(identity.uid());
+        return responseFor(userRepository.save(user));
     }
 
     private AuthResponse responseFor(AppUser user) {
