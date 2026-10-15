@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../controllers/auth_controller.dart';
@@ -8,6 +11,7 @@ import '../core/constants/app_colors.dart';
 import '../core/constants/app_strings.dart';
 import '../core/widgets/app_loading_view.dart';
 import '../data/models/expense.dart';
+import 'widgets/expense_table.dart';
 
 /// Presenta el dashboard, el listado de gastos y el perfil del usuario autenticado.
 class HomePage extends StatefulWidget {
@@ -150,17 +154,14 @@ class _ExpenseList extends StatelessWidget {
         );
       }
       if (expenseController.expenses.isEmpty) return const _EmptyExpenses();
-      return ListView.separated(
+      return SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16),
-        itemCount: expenseController.expenses.length,
-        separatorBuilder: (_, _) => const SizedBox(height: 8),
-        itemBuilder: (_, index) {
-          final expense = expenseController.expenses[index];
-          return _ExpenseTile(
-            expense: expense,
-            onDelete: () => _confirmDeletion(context, expense),
-          );
-        },
+        child: ExpenseTable(
+          expenses: expenseController.expenses,
+          onViewReceipt: (expense) => _showReceipt(context, expense),
+          onDelete: (expense) => _confirmDeletion(context, expense),
+        ),
       );
     }),
   );
@@ -185,6 +186,33 @@ class _ExpenseList extends StatelessWidget {
       ),
     );
     if (shouldDelete ?? false) await expenseController.remove(expense.id);
+  }
+
+  Future<void> _showReceipt(BuildContext context, Expense expense) async {
+    final receiptPath = expense.receiptLocalPath;
+    if (receiptPath == null) return;
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Boleta local'),
+        content: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520, maxHeight: 560),
+          child: Image.file(
+            File(receiptPath),
+            fit: BoxFit.contain,
+            errorBuilder: (_, _, _) => const Text(
+              'La imagen ya no está disponible en este dispositivo.',
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -267,10 +295,9 @@ class _MetricCard extends StatelessWidget {
 }
 
 class _ExpenseTile extends StatelessWidget {
-  const _ExpenseTile({required this.expense, this.onDelete});
+  const _ExpenseTile({required this.expense});
 
   final Expense expense;
-  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) => Card(
@@ -287,12 +314,6 @@ class _ExpenseTile extends StatelessWidget {
             _currency(expense.amount),
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          if (onDelete != null)
-            IconButton(
-              onPressed: onDelete,
-              icon: const Icon(Icons.delete_outline),
-              tooltip: AppStrings.delete,
-            ),
         ],
       ),
     ),
@@ -374,9 +395,11 @@ class _AddExpenseSheetState extends State<_AddExpenseSheet> {
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _imagePicker = ImagePicker();
   DateTime _date = DateTime.now();
   String _category = AppStrings.defaultCategory;
   String _paymentMethod = AppStrings.defaultPaymentMethod;
+  XFile? _receipt;
 
   @override
   void dispose() {
@@ -395,6 +418,7 @@ class _AddExpenseSheetState extends State<_AddExpenseSheet> {
           ? null
           : _descriptionController.text.trim(),
       paymentMethod: _paymentMethod,
+      receipt: _receipt,
     );
     if (!mounted) return;
     if (didSave) {
@@ -480,6 +504,12 @@ class _AddExpenseSheetState extends State<_AddExpenseSheet> {
               ),
               maxLines: 2,
             ),
+            const SizedBox(height: 12),
+            _ReceiptPicker(
+              receipt: _receipt,
+              onPick: _selectReceipt,
+              onRemove: () => setState(() => _receipt = null),
+            ),
             const SizedBox(height: 20),
             FilledButton(onPressed: _save, child: const Text(AppStrings.save)),
           ],
@@ -496,6 +526,78 @@ class _AddExpenseSheetState extends State<_AddExpenseSheet> {
       lastDate: DateTime.now(),
     );
     if (selectedDate != null) setState(() => _date = selectedDate);
+  }
+
+  Future<void> _selectReceipt() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined),
+              title: const Text('Tomar foto'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Seleccionar del dispositivo'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (source == null) return;
+    final receipt = await _imagePicker.pickImage(
+      source: source,
+      imageQuality: 88,
+    );
+    if (receipt != null && mounted) setState(() => _receipt = receipt);
+  }
+}
+
+class _ReceiptPicker extends StatelessWidget {
+  const _ReceiptPicker({
+    required this.receipt,
+    required this.onPick,
+    required this.onRemove,
+  });
+
+  final XFile? receipt;
+  final VoidCallback onPick;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    if (receipt == null) {
+      return OutlinedButton.icon(
+        onPressed: onPick,
+        icon: const Icon(Icons.add_a_photo_outlined),
+        label: const Text('Adjuntar boleta (opcional)'),
+      );
+    }
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: Image.file(
+          File(receipt!.path),
+          width: 52,
+          height: 52,
+          fit: BoxFit.cover,
+          errorBuilder: (_, _, _) => const Icon(Icons.broken_image_outlined),
+        ),
+      ),
+      title: const Text('Boleta adjunta'),
+      subtitle: const Text('Se guardará solamente en este dispositivo.'),
+      trailing: IconButton(
+        tooltip: 'Quitar boleta',
+        onPressed: onRemove,
+        icon: const Icon(Icons.close),
+      ),
+      onTap: onPick,
+    );
   }
 }
 

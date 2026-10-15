@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../config/backend_target.dart';
 import '../controllers/auth_controller.dart';
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_strings.dart';
+import '../core/network/api_client.dart';
+import '../core/storage/backend_target_store.dart';
 
 /// Ofrece en una sola pantalla los flujos de inicio de sesión y registro del MVP.
 class AuthPage extends StatefulWidget {
@@ -20,6 +23,13 @@ class _AuthPageState extends State<AuthPage> {
   final _passwordController = TextEditingController();
   final _confirmationController = TextEditingController();
   bool _isRegistering = false;
+  late BackendTarget _backendTarget;
+
+  @override
+  void initState() {
+    super.initState();
+    _backendTarget = Get.find<BackendTargetStore>().current;
+  }
 
   @override
   void dispose() {
@@ -165,6 +175,26 @@ class _AuthPageState extends State<AuthPage> {
                                 : AppStrings.createAccount,
                           ),
                         ),
+                        const Divider(height: 32),
+                        DropdownButtonFormField<BackendTarget>(
+                          initialValue: _backendTarget,
+                          decoration: const InputDecoration(
+                            labelText: 'Backend de integración',
+                            helperText:
+                                'El puerto se aplica antes de iniciar sesión.',
+                          ),
+                          items: BackendTarget.values
+                              .map(
+                                (target) => DropdownMenuItem(
+                                  value: target,
+                                  child: Text(
+                                    '${target.label} · puerto ${target.port}',
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: _selectBackend,
+                        ),
                       ],
                     ),
                   ),
@@ -189,4 +219,11 @@ class _AuthPageState extends State<AuthPage> {
 
   String? _passwordValidator(String? value) =>
       (value == null || value.length < 8) ? AppStrings.invalidPassword : null;
+
+  Future<void> _selectBackend(BackendTarget? target) async {
+    if (target == null) return;
+    await Get.find<BackendTargetStore>().save(target);
+    Get.find<ApiClient>().configureBackend(target);
+    if (mounted) setState(() => _backendTarget = target);
+  }
 }

@@ -2,8 +2,8 @@ spring:
   application:
     name: snapgasto-backend
   datasource:
-    url: jdbc:sqlserver://${DB_HOST:localhost}:${DB_PORT:1433};databaseName=${DB_NAME:snap_gastos};encrypt=true;trustServerCertificate=true
-    username: ${DB_USER:sa}
+    url: jdbc:sqlserver://${DB_HOST}:${DB_PORT};databaseName=${DB_NAME};encrypt=true;trustServerCertificate=true
+    username: ${DB_USER}
     password: ${DB_PASSWORD}
   jpa:
     hibernate:
@@ -27,6 +27,7 @@ app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:*,http://127.0.0.1:*}
   security:
+    enabled: false
     jwt:
-      secret: ${JWT_SECRET}
+      secret: ${JWT_SECRET:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30s}
       expiration-minutes: ${JWT_EXPIRATION_MINUTES:120}

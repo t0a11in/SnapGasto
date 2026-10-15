@@ -1,0 +1,36 @@
+<main class="auth-layout">
+  <section class="auth-card" aria-labelledby="login-title">
+    <p class="eyebrow">SNAPGASTO · ADMIN</p>
+    <h1 id="login-title">Mantenedores</h1>
+    <p class="muted">Administra usuarios, gastos, categorías y notificaciones.</p>
+
+    <form class="form-stack" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      @if (registerMode()) {
+        <label class="field">
+          <span>Nombre completo</span>
+          <input formControlName="fullName" autocomplete="name" maxlength="120" />
+        </label>
+      }
+      <label class="field">
+        <span>Correo electrónico</span>
+        <input formControlName="email" type="email" autocomplete="email" />
+      </label>
+      <label class="field">
+        <span>Contraseña</span>
+        <input formControlName="password" type="password" [autocomplete]="registerMode() ? 'new-password' : 'current-password'" minlength="8" />
+      </label>
+
+      @if (message()) {
+        <p class="message" [class.message-error]="isError()" [class.message-success]="!isError()" role="status">{{ message() }}</p>
+      }
+
+      <button class="button button-primary" [disabled]="loading()" type="submit">
+        {{ loading() ? 'Procesando…' : registerMode() ? 'Crear cuenta' : 'Ingresar' }}
+      </button>
+    </form>
+
+    <button class="button button-link" type="button" (click)="toggleMode()">
+      {{ registerMode() ? 'Ya tengo una cuenta' : 'Crear la primera cuenta' }}
+    </button>
+  </section>
+</main>

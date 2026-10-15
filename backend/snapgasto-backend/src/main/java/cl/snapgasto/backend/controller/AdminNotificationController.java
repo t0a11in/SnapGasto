@@ -1,5 +1,8 @@
 package cl.snapgasto.backend.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -24,6 +27,8 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/admin/notifications")
 @PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Administración: notificaciones", description = "Mantenedor de notificaciones. Requiere rol ADMIN.")
+@SecurityRequirement(name = "bearerAuth")
 public class AdminNotificationController {
 
     private final NotificationService notificationService;

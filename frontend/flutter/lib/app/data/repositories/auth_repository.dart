@@ -36,7 +36,7 @@ class AuthRepository {
 
   Future<AuthUser> me() async {
     final response = await _apiClient.dio.get<Map<String, dynamic>>(
-      '/users/me',
+      '/auth/session',
     );
     return AuthUser.fromJson(response.data!);
   }

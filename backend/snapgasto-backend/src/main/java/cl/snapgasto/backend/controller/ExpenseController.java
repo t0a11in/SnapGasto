@@ -1,5 +1,8 @@
 package cl.snapgasto.backend.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +26,8 @@ import jakarta.validation.Valid;
 /** Publica el CRUD mínimo de gastos autenticados. */
 @RestController
 @RequestMapping("/api/expenses")
+@Tag(name = "Gastos", description = "Registro y consulta de gastos del usuario autenticado.")
+@SecurityRequirement(name = "bearerAuth")
 public class ExpenseController {
 
     private final ExpenseService expenseService;

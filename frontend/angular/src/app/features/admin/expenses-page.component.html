@@ -1,0 +1,37 @@
+<header class="page-header">
+  <div><p class="eyebrow">MANTENEDOR</p><h1>Gastos</h1></div>
+  <span class="api-status">API conectada</span>
+</header>
+
+<section class="maintenance">
+  <div class="panel-actions"><button class="button button-secondary" type="button" (click)="load()">↻ Actualizar</button><button class="button button-primary" type="button" [disabled]="!users().length" (click)="openCreate()">＋ Nuevo gasto</button></div>
+  @if (message()) { <p class="message message-success" role="status">{{ message() }}</p> }
+  @if (loading()) {
+    <div class="state-card">Cargando mantenedor…</div>
+  } @else if (error()) {
+    <div class="state-card error-state"><p>{{ error() }}</p><button class="button button-secondary" type="button" (click)="load()">Reintentar</button></div>
+  } @else if (!expenses().length) {
+    <div class="state-card">No hay gastos aún. @if (!users().length) { Crea primero un usuario. }</div>
+  } @else {
+    <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Usuario</th><th>Categoría</th><th>Monto</th><th>Pago</th><th>Acciones</th></tr></thead><tbody>
+      @for (expense of expenses(); track expense.id) {
+        <tr><td>{{ formatDate(expense.date) }}</td><td>{{ expense.userName }}</td><td>{{ expense.category }}</td><td><strong>{{ formatAmount(expense.amount) }}</strong></td><td>{{ expense.paymentMethod }}</td><td class="actions"><button class="icon-button" type="button" (click)="openEdit(expense)" title="Editar">✎</button><button class="icon-button danger" type="button" (click)="remove(expense)" title="Eliminar">⌫</button></td></tr>
+      }
+    </tbody></table></div>
+  }
+</section>
+
+@if (editing() !== undefined) {
+  <div class="modal-backdrop" role="presentation" (mousedown)="closeModal()"><section class="modal" role="dialog" aria-modal="true" [attr.aria-label]="editing() ? 'Editar gasto' : 'Nuevo gasto'" (mousedown)="$event.stopPropagation()">
+    <div class="modal-header"><h2>{{ editing() ? 'Editar gasto' : 'Nuevo gasto' }}</h2><button class="icon-button" type="button" (click)="closeModal()" aria-label="Cerrar">×</button></div>
+    <form class="form-grid" [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <label class="field"><span>Usuario</span><select formControlName="userId">@for (user of users(); track user.id) { <option [value]="user.id">{{ user.fullName }} · {{ user.email }}</option> }</select></label>
+      <label class="field"><span>Monto</span><input formControlName="amount" type="number" min="0.01" step="0.01" /></label>
+      <label class="field"><span>Categoría</span><input formControlName="category" list="categories" maxlength="80" /><datalist id="categories">@for (category of categories(); track category.id) { <option [value]="category.name"></option> }</datalist></label>
+      <label class="field"><span>Fecha</span><input formControlName="date" type="date" /></label>
+      <label class="field"><span>Método de pago</span><input formControlName="paymentMethod" maxlength="60" /></label>
+      <label class="field field-wide"><span>Descripción</span><textarea formControlName="description" rows="4" maxlength="500"></textarea></label>
+      <div class="form-buttons field-wide"><button class="button button-secondary" type="button" (click)="closeModal()">Cancelar</button><button class="button button-primary" type="submit" [disabled]="saving()">{{ saving() ? 'Guardando…' : 'Guardar' }}</button></div>
+    </form>
+  </section></div>
+}

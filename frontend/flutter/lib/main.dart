@@ -8,9 +8,12 @@ import 'app/controllers/expense_controller.dart';
 import 'app/core/constants/app_colors.dart';
 import 'app/core/constants/app_strings.dart';
 import 'app/core/network/api_client.dart';
+import 'app/core/storage/backend_target_store.dart';
+import 'app/core/storage/secure_session_storage.dart';
 import 'app/core/widgets/app_loading_view.dart';
 import 'app/data/repositories/auth_repository.dart';
 import 'app/data/repositories/expense_repository.dart';
+import 'app/data/storage/local_receipt_store.dart';
 import 'app/pages/auth_page.dart';
 import 'app/pages/home_page.dart';
 
@@ -19,11 +22,25 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
 
-  Get.put(ApiClient(GetStorage()));
+  final legacyStorage = GetStorage();
+  final backendTargetStore = Get.put(BackendTargetStore(legacyStorage));
+  final secureSessionStorage = Get.put(SecureSessionStorage());
+  final legacyToken = legacyStorage.read<String>('access_token');
+  if ((await secureSessionStorage.readToken()) == null &&
+      legacyToken != null &&
+      legacyToken.isNotEmpty) {
+    await secureSessionStorage.writeToken(legacyToken);
+  }
+  await legacyStorage.remove('access_token');
+
+  final apiClient = Get.put(ApiClient(Get.find()));
+  apiClient.configureBackend(backendTargetStore.current);
+  await apiClient.restoreToken();
   Get.put(AuthRepository(Get.find()));
   Get.put(ExpenseRepository(Get.find()));
+  Get.put(LocalReceiptStore(GetStorage()));
   final authController = Get.put(AuthController(Get.find(), Get.find()));
-  Get.put(ExpenseController(Get.find(), Get.find()));
+  Get.put(ExpenseController(Get.find(), Get.find(), Get.find()));
   await authController.restoreSession();
 
   runApp(const SnapGastoApp());

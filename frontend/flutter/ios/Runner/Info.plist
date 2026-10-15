@@ -24,6 +24,10 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>NSCameraUsageDescription</key>
+	<string>SnapGasto usa la cámara para adjuntar la foto de una boleta a un gasto.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>SnapGasto usa tus fotos para adjuntar una boleta a un gasto.</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

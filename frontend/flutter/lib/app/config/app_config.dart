@@ -5,4 +5,10 @@ abstract final class AppConfig {
     'API_BASE_URL',
     defaultValue: 'http://localhost:8080/api',
   );
+
+  /// Conserva host y ruta configurados con --dart-define y reemplaza sólo el puerto.
+  static String apiBaseUrlForPort(int port) {
+    final uri = Uri.parse(apiBaseUrl);
+    return uri.replace(port: port).toString();
+  }
 }

@@ -1,5 +1,8 @@
 package cl.snapgasto.backend.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -26,6 +29,8 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/admin/users")
 @PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Administración: usuarios", description = "Mantenedor de usuarios. Requiere rol ADMIN.")
+@SecurityRequirement(name = "bearerAuth")
 public class AdminUserController {
 
     private final AdminUserService adminUserService;

@@ -1,5 +1,7 @@
 package cl.snapgasto.backend.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +19,7 @@ import jakarta.validation.Valid;
 /** Publica los endpoints de registro e inicio de sesión no protegidos. */
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Autenticación", description = "Registro e inicio de sesión públicos.")
 public class AuthController {
 
     private final AuthService authService;
