@@ -1,14 +1,17 @@
 import { Routes } from '@angular/router';
 import { adminGuard } from './core/guards/admin.guard';
+import { authGuard } from './core/guards/auth.guard';
 import { AdminShellComponent } from './features/admin/admin-shell.component';
 import { CategoriesPageComponent } from './features/admin/categories-page.component';
 import { ExpensesPageComponent } from './features/admin/expenses-page.component';
 import { NotificationsPageComponent } from './features/admin/notifications-page.component';
 import { UsersPageComponent } from './features/admin/users-page.component';
 import { LoginPageComponent } from './features/auth/login-page.component';
+import { IncomesPageComponent } from './features/incomes/incomes-page.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
+  { path: 'incomes', component: IncomesPageComponent, canActivate: [authGuard], title: 'Ingresos | SnapGasto' },
   {
     path: 'admin',
     component: AdminShellComponent,
@@ -21,6 +24,6 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'users' }
     ]
   },
-  { path: '', pathMatch: 'full', redirectTo: 'admin' },
-  { path: '**', redirectTo: 'admin' }
+  { path: '', pathMatch: 'full', redirectTo: 'incomes' },
+  { path: '**', redirectTo: 'incomes' }
 ];
