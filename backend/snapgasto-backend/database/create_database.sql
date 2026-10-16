@@ -1,8 +1,10 @@
--- Crea la base de datos del MVP. Ejecutar una vez desde SSMS con un usuario con permisos de creación.
-IF DB_ID(N'snap_gastos') IS NULL
+-- Se ejecuta automáticamente por el servicio db-init de Docker Compose.
+-- La variable DB_NAME se entrega mediante sqlcmd y debe ser un nombre simple
+-- de base de datos, por ejemplo: snap_gastos.
+IF DB_ID(N'$(DB_NAME)') IS NULL
 BEGIN
-    CREATE DATABASE snap_gastos;
+    CREATE DATABASE [$(DB_NAME)];
 END;
 GO
 
--- Las tablas users y expenses se generan y actualizan mediante JPA al iniciar la API.
+-- Las tablas se crean mediante las migraciones de Flyway incluidas en la API.

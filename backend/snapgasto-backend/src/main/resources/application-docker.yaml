@@ -1,0 +1,7 @@
+spring:
+  config:
+    activate:
+      on-profile: docker
+  datasource:
+    # Dentro de Docker, el hostname es el nombre del servicio definido en Compose.
+    url: jdbc:sqlserver://${DB_HOST:db}:${DB_PORT:1433};databaseName=${DB_NAME:snap_gastos};encrypt=${DB_ENCRYPT:true};trustServerCertificate=${DB_TRUST_SERVER_CERTIFICATE:true}

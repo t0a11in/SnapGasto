@@ -1,21 +1,66 @@
-# Ejecuta solamente la API; SQL Server permanece en el equipo anfitrión.
 name: snapgasto
 
 services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: snapgasto-db
+    hostname: snapgasto-db
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en .env o en el entorno}
+    ports:
+      - "${DB_PORT:-1434}:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q \"SELECT 1\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en .env o en el entorno}
+      DB_NAME: ${DB_NAME:-snap_gastos}
+    volumes:
+      - ./database/create_database.sql:/scripts/create_database.sql:ro
+    entrypoint: ["/bin/bash", "-c"]
+    command: >-
+      echo "Esperando a que SQL Server acepte conexiones externas...";
+      for i in $$(seq 1 40); do
+        /opt/mssql-tools18/bin/sqlcmd -C -S db -U sa -P "$$MSSQL_SA_PASSWORD" -Q "SELECT 1" >/dev/null 2>&1 && break;
+        echo "Intento $$i/40 fallido, reintentando en 3s...";
+        sleep 3;
+      done;
+      echo "Ejecutando create_database.sql...";
+      /opt/mssql-tools18/bin/sqlcmd -C -S db -U sa -P "$$MSSQL_SA_PASSWORD" -v DB_NAME="$$DB_NAME" -i /scripts/create_database.sql
+    restart: "no"
   api:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: snapgasto-api
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
     ports:
       - "${API_PORT:-8080}:8080"
     environment:
-      # Docker Desktop resuelve este host hacia el equipo donde está SQL Server.
-      DB_HOST: host.docker.internal
-      DB_PORT: ${DB_PORT:-1433}
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: db
+      DB_PORT: 1433
       DB_NAME: ${DB_NAME:-snap_gastos}
       DB_USER: ${DB_USER:-sa}
       DB_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en .env o en el entorno}
+      DB_ENCRYPT: "true"
+      DB_TRUST_SERVER_CERTIFICATE: "true"
       JWT_SECRET: ${JWT_SECRET:?Define JWT_SECRET en .env o en el entorno}
       JWT_EXPIRATION_MINUTES: ${JWT_EXPIRATION_MINUTES:-120}
       APP_BOOTSTRAP_ADMIN_EMAIL: ${APP_BOOTSTRAP_ADMIN_EMAIL:-}
@@ -23,6 +68,6 @@ services:
       FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:-}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:*,http://127.0.0.1:*}
       SERVER_PORT: 8080
-    # Mantiene la conectividad también en Docker Engine sobre Linux.
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+
+volumes:
+  sqlserver-data:
