@@ -7,10 +7,12 @@ import 'package:intl/intl.dart';
 
 import '../controllers/auth_controller.dart';
 import '../controllers/expense_controller.dart';
+import '../controllers/income_controller.dart';
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_strings.dart';
 import '../core/widgets/app_loading_view.dart';
 import '../data/models/expense.dart';
+import 'income_page.dart';
 import 'widgets/expense_table.dart';
 
 /// Presenta el dashboard, el listado de gastos y el perfil del usuario autenticado.
@@ -23,31 +25,44 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _expenseController = Get.find<ExpenseController>();
+  final _incomeController = Get.find<IncomeController>();
   int _selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
     _expenseController.load();
+    _incomeController.load();
   }
 
   @override
   Widget build(BuildContext context) {
     final pages = <Widget>[
-      _Dashboard(expenseController: _expenseController),
+      _Dashboard(
+        expenseController: _expenseController,
+        incomeController: _incomeController,
+      ),
       _ExpenseList(expenseController: _expenseController),
+      IncomePage(controller: _incomeController),
       const _Profile(),
     ];
     return Scaffold(
       appBar: AppBar(title: Text(_titleForIndex(_selectedIndex))),
       body: pages[_selectedIndex],
-      floatingActionButton: _selectedIndex == 1
-          ? FloatingActionButton.extended(
-              onPressed: () => _showAddExpense(context),
-              icon: const Icon(Icons.add),
-              label: const Text(AppStrings.addExpense),
-            )
-          : null,
+      floatingActionButton: switch (_selectedIndex) {
+        1 => FloatingActionButton.extended(
+          onPressed: () => _showAddExpense(context),
+          icon: const Icon(Icons.add),
+          label: const Text(AppStrings.addExpense),
+        ),
+        2 => FloatingActionButton.extended(
+          onPressed: () =>
+              showIncomeEditor(context, controller: _incomeController),
+          icon: const Icon(Icons.add),
+          label: const Text(AppStrings.addIncome),
+        ),
+        _ => null,
+      },
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) =>
@@ -64,6 +79,11 @@ class _HomePageState extends State<HomePage> {
             label: AppStrings.expenses,
           ),
           NavigationDestination(
+            icon: Icon(Icons.savings_outlined),
+            selectedIcon: Icon(Icons.savings),
+            label: AppStrings.incomes,
+          ),
+          NavigationDestination(
             icon: Icon(Icons.person_outline),
             selectedIcon: Icon(Icons.person),
             label: AppStrings.profile,
@@ -73,8 +93,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  String _titleForIndex(int index) =>
-      [AppStrings.dashboard, AppStrings.expenses, AppStrings.profile][index];
+  String _titleForIndex(int index) => [
+    AppStrings.dashboard,
+    AppStrings.expenses,
+    AppStrings.incomes,
+    AppStrings.profile,
+  ][index];
 
   Future<void> _showAddExpense(BuildContext context) =>
       showModalBottomSheet<void>(
@@ -85,13 +109,19 @@ class _HomePageState extends State<HomePage> {
 }
 
 class _Dashboard extends StatelessWidget {
-  const _Dashboard({required this.expenseController});
+  const _Dashboard({
+    required this.expenseController,
+    required this.incomeController,
+  });
 
   final ExpenseController expenseController;
+  final IncomeController incomeController;
 
   @override
   Widget build(BuildContext context) => RefreshIndicator(
-    onRefresh: expenseController.load,
+    onRefresh: () async {
+      await Future.wait([expenseController.load(), incomeController.load()]);
+    },
     child: Obx(() {
       if (expenseController.isLoading.value &&
           expenseController.expenses.isEmpty) {
@@ -100,6 +130,12 @@ class _Dashboard extends StatelessWidget {
       return ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          _MetricCard(
+            title: AppStrings.monthlyIncome,
+            value: _currency(incomeController.monthlyTotal),
+            icon: Icons.savings_outlined,
+          ),
+          const SizedBox(height: 12),
           _MetricCard(
             title: AppStrings.monthlyExpense,
             value: _currency(expenseController.monthlyTotal),
