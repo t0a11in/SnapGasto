@@ -30,6 +30,7 @@ node_modules/
 dist/
 build/
 coverage/
+frontend/angular/.angular21-backup-*/
 
 # Flutter and Dart generated files
 .dart_tool/
