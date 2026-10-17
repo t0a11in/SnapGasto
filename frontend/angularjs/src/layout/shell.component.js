@@ -6,9 +6,9 @@ const template = `
       <a class="brand" href="#!/incomes"><span>◈</span> SnapGasto</a>
       <p class="sidebar-caption">ADMINISTRACIÓN</p>
       <nav aria-label="Mantenedores">
-        <a href="#!/incomes">↗ Mis ingresos</a>
         <a href="#!/admin/users">👥 Usuarios</a>
         <a href="#!/admin/expenses">▣ Gastos</a>
+        <a href="#!/incomes">↗ Ingresos</a>
         <a href="#!/admin/categories">◉ Categorías</a>
         <a href="#!/admin/notifications">✉ Notificaciones</a>
       </nav>
