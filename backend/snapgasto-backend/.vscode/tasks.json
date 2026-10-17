@@ -1,0 +1,16 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build: SnapGasto Java",
+      "type": "process",
+      "command": "${workspaceFolder}/mvnw.cmd",
+      "args": ["clean", "compile"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": "$javac",
+      "group": "build"
+    }
+  ]
+}

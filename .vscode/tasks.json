@@ -1,0 +1,30 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build: SnapGasto .NET",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "${workspaceFolder}/backend/snapGastosNet/snapGastosNet.csproj"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": "build"
+    },
+    {
+      "label": "build: SnapGasto Java",
+      "type": "process",
+      "command": "${workspaceFolder}/backend/snapgasto-backend/mvnw.cmd",
+      "args": [
+        "clean",
+        "compile"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/backend/snapgasto-backend"
+      },
+      "problemMatcher": "$javac",
+      "group": "build"
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "type": "java",
+            "name": "API · Spring Boot (Java)",
+            "request": "launch",
+            "mainClass": "cl.snapgasto.backend.SnapgastoBackendApplication",
+            "projectName": "snapgasto-backend",
+            "preLaunchTask": "build: SnapGasto Java",
+            "cwd": "${workspaceFolder}/backend/snapgasto-backend",
+            "envFile": "${workspaceFolder}/backend/snapgasto-backend/.env",
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "java",
+            "name": "Attach SnapGasto Docker",
+            "request": "attach",
+            "hostName": "localhost",
+            "port": 5005
+        },
+        {
+            "type": "java",
+            "name": "API JAVA DOCKER",
+            "hostName": "localhost",
+            "request": "launch",
+            "mainClass": "cl.snapgasto.backend.SnapgastoBackendApplication",
+            "projectName": "snapgasto-backend",
+            "cwd": "${workspaceFolder}/backend/snapgasto-backend",
+            "envFile": "${workspaceFolder}/backend/snapgasto-backend/.env",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "API · .NET (puerto 8081)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build: SnapGasto .NET",
+            "program": "${workspaceFolder}/backend/snapGastosNet/bin/Debug/net10.0/snapGastosNet.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/backend/snapGastosNet",
+            "envFile": "${workspaceFolder}/backend/snapGastosNet/.env",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "justMyCode": true
+        },
+        {
+            "name": "API · Django (puerto 8082)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/backend/snapGastosDjango/manage.py",
+            "args": [
+                "runserver",
+                "8082",
+                "--noreload"
+            ],
+            "django": true,
+            "python": "${workspaceFolder}/backend/snapGastosDjango/.venv/Scripts/python.exe",
+            "cwd": "${workspaceFolder}/backend/snapGastosDjango",
+            "envFile": "${workspaceFolder}/backend/snapGastosDjango/.env",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "API · Node/Express (puerto 8083)",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run",
+                "dev"
+            ],
+            "cwd": "${workspaceFolder}/backend/snapGastosNode",
+            "envFile": "${workspaceFolder}/backend/snapGastosNode/.env",
+            "console": "integratedTerminal",
+            "restart": true,
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "name": "flutter",
+            "cwd": "frontend\\flutter",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "flutter (profile mode)",
+            "cwd": "frontend\\flutter",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "flutter (release mode)",
+            "cwd": "frontend\\flutter",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}
