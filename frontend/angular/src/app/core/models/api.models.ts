@@ -12,6 +12,11 @@ export interface AuthResponse {
   user: SessionUser;
 }
 
+/** Contrato de error estable que devuelve la API de SnapGasto. */
+export interface ApiError {
+  message: string;
+}
+
 export interface LoginPayload {
   email: string;
   password: string;

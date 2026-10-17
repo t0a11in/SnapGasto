@@ -3,6 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { API_BASE_URL } from '../config/api-base-url.token';
 import { AuthResponse } from '../models/api.models';
+import { AppStore } from '../state/App.store';
 import { SessionStore } from '../state/session.store';
 import { AuthApiService } from './auth-api.service';
 
@@ -16,6 +17,7 @@ describe('AuthApiService', () => {
   let service: AuthApiService;
   let httpTesting: HttpTestingController;
   let sessionStore: SessionStore;
+  let appStore: AppStore;
 
   beforeEach(() => {
     localStorage.clear();
@@ -29,6 +31,7 @@ describe('AuthApiService', () => {
     service = TestBed.inject(AuthApiService);
     httpTesting = TestBed.inject(HttpTestingController);
     sessionStore = TestBed.inject(SessionStore);
+    appStore = TestBed.inject(AppStore);
   });
 
   afterEach(() => {
@@ -37,6 +40,7 @@ describe('AuthApiService', () => {
   });
 
   it('sends credentials and persists a successful session', () => {
+    appStore.setTokenLife('CLOSED');
     service.login({ email: 'ana@example.com', password: 'secreto123' }).subscribe();
 
     const request = httpTesting.expectOne(`${API_URL}/auth/login`);
@@ -45,6 +49,7 @@ describe('AuthApiService', () => {
     request.flush(session);
 
     expect(sessionStore.session()).toEqual(session);
+    expect(appStore.tokenLife()).toBe('OPEN');
     expect(JSON.parse(localStorage.getItem('snapgasto.admin.session') ?? '{}')).toEqual(session);
   });
 

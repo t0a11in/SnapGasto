@@ -48,4 +48,11 @@ describe('authInterceptor', () => {
     expect(request.request.headers.has('Authorization')).toBe(false);
     request.flush({});
   });
+
+  it('adds Bearer JWT to protected authentication endpoints', () => {
+    http.get(`${API_URL}/auth/v1/token-status`).subscribe();
+    const request = httpTesting.expectOne(`${API_URL}/auth/v1/token-status`);
+    expect(request.request.headers.get('Authorization')).toBe('Bearer jwt-token');
+    request.flush({ tokenAlive: true });
+  });
 });
