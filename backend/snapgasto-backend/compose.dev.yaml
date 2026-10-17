@@ -1,0 +1,16 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command:
+      - mvn
+      - spring-boot:run
+      - "-Dspring-boot.run.jvmArguments=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./src
+          target: /workspace/src
+        - action: rebuild
+          path: ./pom.xml
