@@ -81,3 +81,10 @@ liviana de sesión para el frontend. Envía el header
 Los tokens ausentes, expirados, inválidos o asociados a un usuario eliminado
 reciben `401`. No es un circuit breaker de infraestructura: no reintenta ni
 oculta fallas de servicios externos; sólo valida la sesión actual.
+
+### Renovación de token
+
+`POST /api/auth/v1/refresh` recibe el mismo header `Authorization: Bearer
+<token>` y emite un nuevo `accessToken` mientras el token recibido siga
+vigente. No acepta credenciales ni un token vencido: en ambos casos responde
+`401`.
