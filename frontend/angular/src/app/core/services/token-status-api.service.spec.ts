@@ -29,4 +29,14 @@ describe('TokenStatusApiService', () => {
     expect(request.request.method).toBe('GET');
     request.flush({ tokenAlive: true });
   });
+
+  it('conserves the API error message when the token is rejected', () => {
+    let message = '';
+    service.check().subscribe({ error: (error: Error) => message = error.message });
+
+    const request = httpTesting.expectOne('http://api.test/api/auth/v1/token-status');
+    request.flush({ message: 'No autorizado.' }, { status: 401, statusText: 'Unauthorized' });
+
+    expect(message).toBe('No autorizado.');
+  });
 });

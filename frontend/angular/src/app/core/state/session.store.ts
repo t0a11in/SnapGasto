@@ -26,11 +26,13 @@ export class SessionStore {
       if (!raw) return null;
       const value = JSON.parse(raw) as Partial<AuthResponse>;
       if (!value.accessToken || !value.user?.id || !value.user.email || !value.user.fullName || !value.user.role) {
+        console.log('borrado SESSION_KEY ')
         localStorage.removeItem(SESSION_KEY);
         return null;
       }
       return value as AuthResponse;
     } catch {
+      console.log('borrado SESSION_KEY ')
       localStorage.removeItem(SESSION_KEY);
       return null;
     }

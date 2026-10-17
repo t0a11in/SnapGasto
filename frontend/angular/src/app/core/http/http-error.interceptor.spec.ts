@@ -2,6 +2,7 @@ import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { API_BASE_URL } from '../config/api-base-url.token';
+import { SessionRecoveryService } from '../services/session-recovery.service';
 import { AppStore } from '../state/App.store';
 import { SessionStore } from '../state/session.store';
 import { httpErrorInterceptor } from './http-error.interceptor';
@@ -13,12 +14,14 @@ describe('httpErrorInterceptor', () => {
   let httpTesting: HttpTestingController;
   let appStore: AppStore;
   let sessionStore: SessionStore;
+  const sessionRecovery = jasmine.createSpyObj<SessionRecoveryService>('SessionRecoveryService', ['requestNewToken']);
 
   beforeEach(() => {
     localStorage.clear();
     TestBed.configureTestingModule({
       providers: [
         { provide: API_BASE_URL, useValue: API_URL },
+        { provide: SessionRecoveryService, useValue: sessionRecovery },
         provideHttpClient(withInterceptors([httpErrorInterceptor])),
         provideHttpClientTesting(),
       ],
@@ -27,6 +30,7 @@ describe('httpErrorInterceptor', () => {
     httpTesting = TestBed.inject(HttpTestingController);
     appStore = TestBed.inject(AppStore);
     sessionStore = TestBed.inject(SessionStore);
+    sessionRecovery.requestNewToken.calls.reset();
     spyOn(console, 'error');
   });
 
@@ -68,5 +72,14 @@ describe('httpErrorInterceptor', () => {
     expect(appStore.circuit_braker()).toBe('CLOSED');
     expect(appStore.tokenLife()).toBe('CLOSED');
     expect(sessionStore.session()).toBeNull();
+  });
+
+  it('requests a new token when the API reports an expired session', () => {
+    http.get(`${API_URL}/incomes/listar`).subscribe({ error: () => undefined });
+
+    const request = httpTesting.expectOne(`${API_URL}/incomes/listar`);
+    request.flush({ message: 'Sesión expirada.' }, { status: 419, statusText: 'Authentication Timeout' });
+
+    expect(sessionRecovery.requestNewToken).toHaveBeenCalled();
   });
 });

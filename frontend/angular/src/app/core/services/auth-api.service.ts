@@ -28,11 +28,13 @@ export class AuthApiService {
   }
 
   logout(): void {
+    console.log('this.logout')
     this.sessionStore.clear();
     this.appStore.setTokenLife('CLOSED');
   }
 
   private startSession(session: AuthResponse): void {
+    console.log('this.startSession')
     this.sessionStore.start(session);
     this.appStore.setTokenLife('OPEN');
   }

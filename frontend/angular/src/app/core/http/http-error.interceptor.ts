@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { catchError, tap, throwError } from 'rxjs';
 import { apiErrorMessage } from './api-error';
 import { API_BASE_URL } from '../config/api-base-url.token';
+import { SessionRecoveryService } from '../services/session-recovery.service';
 import { AppStore } from '../state/App.store';
 import { SessionStore } from '../state/session.store';
 
@@ -13,6 +14,7 @@ import { SessionStore } from '../state/session.store';
 export const httpErrorInterceptor: HttpInterceptorFn = (request, next) => {
   const appStore = inject(AppStore);
   const sessionStore = inject(SessionStore);
+  const sessionRecovery = inject(SessionRecoveryService);
   const apiBaseUrl = inject(API_BASE_URL);
   const isApiRequest = request.url.startsWith(apiBaseUrl);
   return next(request).pipe(
@@ -30,7 +32,9 @@ export const httpErrorInterceptor: HttpInterceptorFn = (request, next) => {
         if (isApiRequest && (error.status === 0 || error.status >= 500)) {
           appStore.setCircuitBreaker('OPEN');
         }
-        if (isApiRequest && (error.status === 401)) {
+        if (isApiRequest && error.status === 419) {
+          sessionRecovery.requestNewToken();
+        } else if (isApiRequest && error.status === 401) {
           sessionStore.clear();
           appStore.setTokenLife('CLOSED');
         }

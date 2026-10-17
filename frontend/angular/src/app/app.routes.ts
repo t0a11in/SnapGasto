@@ -31,6 +31,6 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'users' }
     ]
   },
-  { path: '', pathMatch: 'full', redirectTo: 'incomes' },
-  { path: '**', redirectTo: 'incomes' }
+  { path: '', pathMatch: 'full', redirectTo: 'admin/incomes' },
+  { path: '**', redirectTo: 'admin/incomes' }
 ];

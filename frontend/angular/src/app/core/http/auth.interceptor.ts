@@ -11,7 +11,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const session = inject(SessionStore).session();
   const isPublicAuthenticationRequest = PUBLIC_AUTH_PATHS
     .some((path) => request.url.startsWith(`${baseUrl}${path}`));
-
+  console.log('auth autorization ')
   if (!session?.accessToken || !request.url.startsWith(baseUrl) || isPublicAuthenticationRequest) {
     return next(request);
   }

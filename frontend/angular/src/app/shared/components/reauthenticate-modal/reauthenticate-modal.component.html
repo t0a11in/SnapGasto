@@ -1,0 +1,20 @@
+<div class="modal-header">
+  <div>
+    <p class="eyebrow">SESIÓN EXPIRADA</p>
+    <h2>Confirma tu identidad</h2>
+  </div>
+</div>
+
+<div class="modal-body">
+  <p class="muted">Tu sesión venció. Ingresa nuevamente para continuar donde estabas.</p>
+
+  <app-auth-credentials-form
+    [loading]="loading()"
+    [errorMessage]="message()"
+    (submitted)="authenticate($event)"
+  />
+
+  <button class="button button-link" type="button" [disabled]="loading()" (click)="cancel()">
+    Cerrar sesión
+  </button>
+</div>

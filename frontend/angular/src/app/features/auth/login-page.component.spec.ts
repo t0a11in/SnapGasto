@@ -1,8 +1,10 @@
-import { TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { of } from 'rxjs';
 import { AuthApiService } from '../../core/services/auth-api.service';
 import { SessionStore } from '../../core/state/session.store';
+import { AuthCredentialsFormComponent } from '../../shared/components/auth-credentials-form/auth-credentials-form.component';
 import { LoginPageComponent } from './login-page.component';
 
 describe('1) Login COMPONENT', () => {
@@ -10,7 +12,12 @@ describe('1) Login COMPONENT', () => {
   const sessionStore = jasmine.createSpyObj<SessionStore>('SessionStore', ['clear']);
   const router = jasmine.createSpyObj<Pick<Router, 'navigateByUrl'>>('Router', ['navigateByUrl']);
 
+  function credentialsForm(fixture: ComponentFixture<LoginPageComponent>): AuthCredentialsFormComponent {
+    return fixture.debugElement.query(By.directive(AuthCredentialsFormComponent)).componentInstance;
+  }
+
   beforeEach(async () => {
+    localStorage.clear();
     authApi.login.calls.reset();
     authApi.register.calls.reset();
     authApi.logout.calls.reset();
@@ -21,7 +28,8 @@ describe('1) Login COMPONENT', () => {
       providers: [
         { provide: AuthApiService, useValue: authApi },
         { provide: SessionStore, useValue: sessionStore },
-        { provide: Router, useValue: router }
+        { provide: Router, useValue: router },
+        { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: convertToParamMap({}) } } }
       ]
     }).compileComponents();
   });
@@ -38,19 +46,18 @@ describe('1) Login COMPONENT', () => {
       user: { id: 'u-1', fullName: 'Ana', email: 'ana@example.com', role: 'ADMIN' }
     }));
     const fixture = TestBed.createComponent(LoginPageComponent);
-    const component = fixture.componentInstance;
-    component.form.setValue({ fullName: '', email: 'ana@example.com', password: 'secreto123' });
-    component.submit();
-    console.log('authApi');
-    console.log(component);
+    fixture.detectChanges();
+    const form = credentialsForm(fixture);
+    form.form.setValue({ fullName: '', email: 'ana@example.com', password: 'secreto123', rememberPassword: false });
+    form.submit();
     expect(authApi.login).toHaveBeenCalledWith({ email: 'ana@example.com', password: 'secreto123' });
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/incomes');
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/admin/incomes');
   });
 
   it('Disabled button only email', () => {
     const fixture = TestBed.createComponent(LoginPageComponent);
-    const component = fixture.componentInstance;
-    component.loginForm().value.set({ email: 'ana@example.com', password: '' });
+    fixture.detectChanges();
+    credentialsForm(fixture).form.setValue({ fullName: '', email: 'ana@example.com', password: '', rememberPassword: false });
     fixture.detectChanges();
     const button = fixture.nativeElement.querySelector(
       'button[type="submit"]'
@@ -61,8 +68,8 @@ describe('1) Login COMPONENT', () => {
 
   it('Disabled button not real email', () => {
     const fixture = TestBed.createComponent(LoginPageComponent);
-    const component = fixture.componentInstance;
-    component.loginForm().value.set({ email: 'xxx.xxxx.com', password: 'xxxx' });
+    fixture.detectChanges();
+    credentialsForm(fixture).form.setValue({ fullName: '', email: 'xxx.xxxx.com', password: 'xxxx', rememberPassword: false });
     fixture.detectChanges();
     const button = fixture.nativeElement.querySelector(
       'button[type="submit"]'
@@ -73,8 +80,8 @@ describe('1) Login COMPONENT', () => {
 
   it('Not disabled button', () => {
     const fixture = TestBed.createComponent(LoginPageComponent);
-    const component = fixture.componentInstance;
-    component.loginForm().value.set({ email: 'xxxx@xxxx.com', password: '1234567890' });
+    fixture.detectChanges();
+    credentialsForm(fixture).form.setValue({ fullName: '', email: 'xxxx@xxxx.com', password: '1234567890', rememberPassword: false });
     fixture.detectChanges();
 
     const button = fixture.nativeElement.querySelector(

@@ -12,6 +12,7 @@ export function apiErrorMessage(error: unknown): string {
     if (error.status === 401) return 'Tu sesión no es válida o expiró. Inicia sesión nuevamente.';
     if (error.status === 403) return 'No tienes permisos para realizar esta acción.';
     if (error.status === 404) return 'No se encontró el recurso solicitado.';
+    if (error.status === 419) return 'Tu sesión expiró. Inicia sesión nuevamente.';
     if (error.status === 409) return 'La operación entra en conflicto con la información existente.';
     if (error.status === 422) return 'No fue posible validar los datos enviados.';
     if (error.status >= 500) return 'La API tuvo un error interno. Inténtalo nuevamente más tarde.';

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { catchError, throwError } from 'rxjs';
+import { catchError, MonoTypeOperatorFunction, throwError } from 'rxjs';
 import { API_BASE_URL } from '../config/api-base-url.token';
 import { apiErrorMessage } from '../http/api-error';
 import { TokenStatus } from '../models/token-status.models';
@@ -16,8 +16,11 @@ export class TokenStatusApiService {
   private readonly baseUrl = inject(API_BASE_URL);
 
   check() {
-    return this.http.get<TokenStatus>(`${this.baseUrl}/auth/v1/token-status`).pipe(
-      catchError((error: unknown) => throwError(() => new Error(apiErrorMessage(error))))
-    );
+    return this.http.get<TokenStatus>(`${this.baseUrl}/auth/v1/token-status`).pipe(this.handleError());
+  }
+
+
+  private handleError<T>(): MonoTypeOperatorFunction<T> {
+    return catchError((error: unknown) => throwError(() => new Error(apiErrorMessage(error))));
   }
 }
