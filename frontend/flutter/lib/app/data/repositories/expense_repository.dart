@@ -22,6 +22,14 @@ class ExpenseRepository {
     String? description,
     required String paymentMethod,
   }) async {
+
+    print({
+        'amount': amount,
+        'category': category,
+        'date': date.toIso8601String().split('T').first,
+        'description': description,
+        'paymentMethod': paymentMethod,
+      });
     final response = await _apiClient.dio.post<Map<String, dynamic>>(
       '/expenses',
       data: {

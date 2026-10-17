@@ -28,6 +28,8 @@ class _AuthPageState extends State<AuthPage> {
   @override
   void initState() {
     super.initState();
+        _emailController.text= "test@uno.cl";
+    _passwordController.text= "Cuatico1234*";
     _backendTarget = Get.find<BackendTargetStore>().current;
   }
 
@@ -42,6 +44,7 @@ class _AuthPageState extends State<AuthPage> {
 
   Future<void> _submit(AuthController controller) async {
     if (!_formKey.currentState!.validate()) return;
+
     if (_isRegistering) {
       await controller.register(
         fullName: _fullNameController.text.trim(),
