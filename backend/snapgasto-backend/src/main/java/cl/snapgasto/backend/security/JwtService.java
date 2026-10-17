@@ -42,11 +42,18 @@ public class JwtService {
     }
 
     public String extractSubject(String token) {
-        Claims claims = Jwts.parser()
+        return extractClaims(token).getSubject();
+    }
+
+    public Date extractExpiration(String token) {
+        return extractClaims(token).getExpiration();
+    }
+
+    private Claims extractClaims(String token) {
+        return Jwts.parser()
                 .verifyWith(signingKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        return claims.getSubject();
     }
 }

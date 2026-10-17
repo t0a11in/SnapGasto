@@ -21,7 +21,8 @@ public class TokenStatusService {
         // El principal sólo existe si Spring Security aceptó el bearer token y
         // pudo resolver al usuario actual desde la base de datos.
         if (authenticatedUser == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No autorizado.");
+            return new TokenStatusResponse(false);
+            // throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No autorizado.");
         }
         return new TokenStatusResponse(true);
     }

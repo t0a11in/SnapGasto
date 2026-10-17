@@ -1,11 +1,9 @@
 package cl.snapgasto.backend.service;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.web.server.ResponseStatusException;
 
 import cl.snapgasto.backend.dto.TokenStatusResponse;
 import cl.snapgasto.backend.entity.AppUser;
@@ -22,9 +20,9 @@ class TokenStatusServiceTest {
     }
 
     @Test
-    void rejectsARequestWithoutAnAuthenticatedPrincipal() {
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> service.check(null));
+    void reportsTheTokenAsNotAliveWithoutAnAuthenticatedPrincipal() {
+        TokenStatusResponse response = service.check(null);
 
-        assertFalse(exception.getStatusCode().is2xxSuccessful());
+        assertFalse(response.tokenAlive());
     }
 }
