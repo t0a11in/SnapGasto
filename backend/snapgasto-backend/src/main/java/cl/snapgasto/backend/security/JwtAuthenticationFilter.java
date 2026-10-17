@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -44,8 +45,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-        } catch (JwtException | IllegalArgumentException ignored) {
-            // Un token inválido se trata como una solicitud no autenticada.
+        } catch (JwtException | IllegalArgumentException | AuthenticationException ignored) {
+            // Un token inválido, expirado o cuyo usuario ya no existe se trata
+            // como una solicitud no autenticada; SecurityConfig responde 401.
         }
         filterChain.doFilter(request, response);
     }

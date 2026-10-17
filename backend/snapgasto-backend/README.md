@@ -67,3 +67,17 @@ sólo para desarrollo; no debe utilizarse para despliegues públicos.
 Las modificaciones de esquema se agregan como archivos nuevos en
 `src/main/resources/db/migration`, siguiendo el formato
 `V2__descripcion.sql`. No se editan migraciones que ya se hayan aplicado.
+
+## Comprobación de sesión JWT
+
+El endpoint autenticado `GET /api/auth/v1/token-status` sirve como comprobación
+liviana de sesión para el frontend. Envía el header
+`Authorization: Bearer <token>` y, si el token sigue vigente, responde:
+
+```json
+{ "tokenAlive": true }
+```
+
+Los tokens ausentes, expirados, inválidos o asociados a un usuario eliminado
+reciben `401`. No es un circuit breaker de infraestructura: no reintenta ni
+oculta fallas de servicios externos; sólo valida la sesión actual.
