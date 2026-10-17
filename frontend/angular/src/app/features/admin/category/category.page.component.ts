@@ -1,12 +1,12 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Category, CategoryPayload } from '../../core/models/api.models';
-import { AdminApiService } from '../../core/services/admin-api.service';
+import { Category, CategoryPayload } from '../../../core/models/api.models';
+import { AdminApiService } from '../../../core/services/admin-api.service';
 
 @Component({
   selector: 'app-categories-page',
   imports: [ReactiveFormsModule],
-  templateUrl: './categories-page.component.html'
+  templateUrl: './category.page.component.html'
 })
 export class CategoriesPageComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder).nonNullable;

@@ -1,13 +1,13 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
-import { AppNotification, NotificationPayload, AdminUser } from '../../core/models/api.models';
-import { AdminApiService } from '../../core/services/admin-api.service';
+import { AppNotification, NotificationPayload, AdminUser } from '../../../core/models/api.models';
+import { AdminApiService } from '../../../core/services/admin-api.service';
 
 @Component({
   selector: 'app-notifications-page',
   imports: [ReactiveFormsModule],
-  templateUrl: './notifications-page.component.html'
+  templateUrl: './notification.page.component.html'
 })
 export class NotificationsPageComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder).nonNullable;

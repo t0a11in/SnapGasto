@@ -1,12 +1,12 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AdminApiService } from '../../core/services/admin-api.service';
-import { AdminUser, AdminUserPayload, Role } from '../../core/models/api.models';
+import { AdminApiService } from '../../../core/services/admin-api.service';
+import { AdminUser, AdminUserPayload, Role } from '../../../core/models/api.models';
 
 @Component({
   selector: 'app-users-page',
   imports: [ReactiveFormsModule],
-  templateUrl: './users-page.component.html'
+  templateUrl: './user.page.component.html'
 })
 export class UsersPageComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder).nonNullable;

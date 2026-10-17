@@ -1,11 +1,11 @@
 import { Routes } from '@angular/router';
 import { adminGuard } from './core/guards/admin.guard';
 import { authGuard } from './core/guards/auth.guard';
-import { AdminShellComponent } from './features/admin/admin-shell.component';
-import { CategoriesPageComponent } from './features/admin/categories-page.component';
-import { ExpensesPageComponent } from './features/admin/expenses-page.component';
-import { NotificationsPageComponent } from './features/admin/notifications-page.component';
-import { UsersPageComponent } from './features/admin/users-page.component';
+import { AdminShellComponent } from './features/admin/shell/admin-shell.component';
+import { CategoriesPageComponent } from './features/admin/category/category.page.component';
+import { ExpensesPageComponent } from './features/admin/expense/expense.page.component';
+import { NotificationsPageComponent } from './features/admin/notification/notification.page.component';
+import { UsersPageComponent } from './features/admin/user/user.page.component';
 import { LoginPageComponent } from './features/auth/login-page.component';
 import { IncomesPageComponent } from './features/incomes/incomes-page.component';
 

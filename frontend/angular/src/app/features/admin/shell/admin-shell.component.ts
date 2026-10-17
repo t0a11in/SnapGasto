@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AuthApiService } from '../../core/services/auth-api.service';
-import { SessionStore } from '../../core/state/session.store';
+import { AuthApiService } from '../../../core/services/auth-api.service';
+import { SessionStore } from '../../../core/state/session.store';
 
 @Component({
   selector: 'app-admin-shell',

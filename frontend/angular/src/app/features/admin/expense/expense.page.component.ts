@@ -1,8 +1,8 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
-import { AdminExpense, AdminExpensePayload, AdminUser, Category } from '../../core/models/api.models';
-import { AdminApiService } from '../../core/services/admin-api.service';
+import { AdminExpense, AdminExpensePayload, AdminUser, Category } from '../../../core/models/api.models';
+import { AdminApiService } from '../../../core/services/admin-api.service';
 
 function currentDate(): string {
   const now = new Date();
@@ -13,7 +13,7 @@ function currentDate(): string {
 @Component({
   selector: 'app-expenses-page',
   imports: [ReactiveFormsModule],
-  templateUrl: './expenses-page.component.html'
+  templateUrl: './expense.page.component.html'
 })
 export class ExpensesPageComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder).nonNullable;
