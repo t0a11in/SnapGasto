@@ -10,6 +10,7 @@ export class SessionStore {
   readonly isAdmin = computed(() => this.user()?.role === 'ADMIN');
 
   start(session: AuthResponse): void {
+    console.log('start SESSION' , SESSION_KEY)
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
     this.session.set(session);
   }

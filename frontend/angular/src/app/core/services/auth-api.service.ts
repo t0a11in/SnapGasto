@@ -13,11 +13,15 @@ export class AuthApiService {
   private readonly sessionStore = inject(SessionStore);
 
   login(payload: LoginPayload) {
+    console.log('INCIO LOGIN*****')
     return this.http.post<AuthResponse>(`${this.baseUrl}/auth/login`, payload).pipe(
       tap((session) => this.sessionStore.start(session)),
       catchError((error: unknown) => throwError(() => new Error(apiErrorMessage(error))))
     );
   }
+
+
+  
 
   register(payload: RegisterPayload) {
     return this.http.post<AuthResponse>(`${this.baseUrl}/auth/register`, payload).pipe(
@@ -27,6 +31,9 @@ export class AuthApiService {
   }
 
   logout(): void {
+    this.sessionStore.clear();
+  }
+  logIn(): void {
     this.sessionStore.clear();
   }
 }

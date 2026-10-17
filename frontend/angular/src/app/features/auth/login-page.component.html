@@ -1,15 +1,16 @@
 <main class="auth-layout">
   <section class="auth-card" aria-labelledby="login-title">
-    <p class="eyebrow">SNAPGASTO · ADMIN</p>
-    <h1 id="login-title">Mantenedores</h1>
-    <p class="muted">Administra usuarios, gastos, categorías y notificaciones.</p>
+    <p class="eyebrow">SNAPGASTO</p>
+    <h1 id="login-title">Login</h1>
+    <h2>Gestiona tus ingresos</h2>
 
-    <form class="form-stack" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+
+    <!-- <form class="form-stack" [formGroup]="form" (ngSubmit)="submit()" novalidate>
       @if (registerMode()) {
-        <label class="field">
-          <span>Nombre completo</span>
-          <input formControlName="fullName" autocomplete="name" maxlength="120" />
-        </label>
+      <label class="field">
+        <span>Nombre completo</span>
+        <input formControlName="fullName" autocomplete="name" maxlength="120" />
+      </label>
       }
       <label class="field">
         <span>Correo electrónico</span>
@@ -17,18 +18,70 @@
       </label>
       <label class="field">
         <span>Contraseña</span>
-        <input formControlName="password" type="password" [autocomplete]="registerMode() ? 'new-password' : 'current-password'" minlength="8" />
+        <input formControlName="password" type="password"
+          [autocomplete]="registerMode() ? 'new-password' : 'current-password'" minlength="8" />
       </label>
 
       @if (message()) {
-        <p class="message" [class.message-error]="isError()" [class.message-success]="!isError()" role="status">{{ message() }}</p>
+      <p class="message" [class.message-error]="isError()" [class.message-success]="!isError()" role="status">{{
+        message() }}</p>
       }
 
-      <button class="button button-primary" [disabled]="loading()" type="submit">
+      <button class="button button-primary" [disabled]="loading() || logginBloq() " type="submit">
         {{ loading() ? 'Procesando…' : registerMode() ? 'Crear cuenta' : 'Ingresar' }}
       </button>
-    </form>
+    </form> -->
 
+
+
+    <form class="form-stack" (submit)="onSubmit($event)" novalidate>
+      @if (registerMode()) {
+      <label class="field">
+        <span>Usuario</span>
+        <input [formField]="loginForm.email" autocomplete="name" />
+      </label>
+      }
+      <div>
+        <label class="field">
+          <span>Correo electrónico</span>
+          <input [formField]="loginForm.email" autocomplete="email" />
+        </label>
+
+        @if (loginForm.email().touched() && loginForm.email().invalid()) {
+        <ul class="error-list">
+          @for (error of loginForm.email().errors(); track error) {
+          <li>{{ error.message }}</li>
+          }
+        </ul>
+        }
+      </div>
+      <div>
+        <label class="field">
+          <span>Contraseña</span>
+          <input [formField]="loginForm.password" type="password"
+            [autocomplete]="registerMode() ? 'new-password' : 'current-password'" />
+        </label>
+        @if (loginForm.password().touched() && loginForm.password().invalid()) {
+        <ul class="error-list">
+          @for (error of loginForm.password().errors(); track error) {
+          <li>{{ error.message }}</li>
+          }
+        </ul>
+        }
+
+      </div>
+
+
+
+      @if (message()) {
+      <p class="message" [class.message-error]="isError()" [class.message-success]="!isError()" role="status">{{
+        message() }}</p>
+      }
+
+      <button class="button button-primary" [disabled]="!canLogin() " type="submit">
+        {{ canLogin() && loading() ? 'Procesando…' : registerMode() ? 'Crear cuenta' : 'Ingresar' }}
+      </button>
+    </form>
     <button class="button button-link" type="button" (click)="toggleMode()">
       {{ registerMode() ? 'Ya tengo una cuenta' : 'Crear la primera cuenta' }}
     </button>

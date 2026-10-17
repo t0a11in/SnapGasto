@@ -32,4 +32,4 @@ npm run build
 npm test
 ```
 
-Las pruebas se ejecutan con Vitest y `HttpTestingController`; no requieren levantar la API ni una base de datos.
+Las pruebas se ejecutan con Karma, Jasmine y `HttpTestingController`; no requieren levantar la API ni una base de datos.
