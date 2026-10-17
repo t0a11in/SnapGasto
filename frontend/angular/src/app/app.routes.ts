@@ -11,7 +11,14 @@ import { IncomesPageComponent } from './features/incomes/incomes-page.component'
 
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
-  { path: 'incomes', component: IncomesPageComponent, canActivate: [authGuard], title: 'Ingresos | SnapGasto' },
+  {
+    path: 'incomes',
+    component: AdminShellComponent,
+    canActivate: [authGuard],
+    children: [
+      { path: '', component: IncomesPageComponent, title: 'Ingresos | SnapGasto' }
+    ]
+  },
   {
     path: 'admin',
     component: AdminShellComponent,

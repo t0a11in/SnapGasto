@@ -1,13 +1,17 @@
 <div class="app-shell">
   <aside class="sidebar">
     <a class="brand" routerLink="/incomes"><span>◈</span> SnapGasto</a>
-    <p class="sidebar-caption">ADMINISTRACIÓN</p>
+    <p class="sidebar-caption">{{ sessionStore.isAdmin() ? 'ADMINISTRACIÓN' : 'MI DINERO' }}</p>
     <nav aria-label="Mantenedores">
-      <a routerLink="users" routerLinkActive="active" class="nav-item"><span aria-hidden="true">👥</span>Usuarios</a>
-      <a routerLink="expenses" routerLinkActive="active" class="nav-item"><span aria-hidden="true">▣</span>Gastos</a>
+      @if (sessionStore.isAdmin()) {
+        <a routerLink="/admin/users" routerLinkActive="active" class="nav-item"><span aria-hidden="true">👥</span>Usuarios</a>
+        <a routerLink="/admin/expenses" routerLinkActive="active" class="nav-item"><span aria-hidden="true">▣</span>Gastos</a>
+      }
       <a routerLink="/incomes" routerLinkActive="active" class="nav-item"><span aria-hidden="true">↗</span>Ingresos</a>
-      <a routerLink="categories" routerLinkActive="active" class="nav-item"><span aria-hidden="true">◉</span>Categorías</a>
-      <a routerLink="notifications" routerLinkActive="active" class="nav-item"><span aria-hidden="true">✉</span>Notificaciones</a>
+      @if (sessionStore.isAdmin()) {
+        <a routerLink="/admin/categories" routerLinkActive="active" class="nav-item"><span aria-hidden="true">◉</span>Categorías</a>
+        <a routerLink="/admin/notifications" routerLinkActive="active" class="nav-item"><span aria-hidden="true">✉</span>Notificaciones</a>
+      }
     </nav>
 
     @if (sessionStore.user(); as user) {

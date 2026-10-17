@@ -1,11 +1,8 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { Income, IncomeMonthlySummary, IncomePayload, IncomeType } from '../../core/models/income.models';
-import { AuthApiService } from '../../core/services/auth-api.service';
 import { IncomeApiService } from '../../core/services/income-api.service';
-import { SessionStore } from '../../core/state/session.store';
 
 function today(): string {
   const now = new Date();
@@ -15,16 +12,13 @@ function today(): string {
 
 @Component({
   selector: 'app-incomes-page',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule],
   templateUrl: './incomes-page.component.html'
 })
 export class IncomesPageComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder).nonNullable;
   private readonly api = inject(IncomeApiService);
-  private readonly authApi = inject(AuthApiService);
-  private readonly router = inject(Router);
 
-  readonly sessionStore = inject(SessionStore);
   readonly maximumDate = today();
   readonly currentMonth = this.maximumDate.slice(0, 7);
   readonly incomes = signal<Income[]>([]);
@@ -133,11 +127,6 @@ export class IncomesPageComponent implements OnInit {
       },
       error: (error: Error) => this.message.set(error.message)
     });
-  }
-
-  logout(): void {
-    this.authApi.logout();
-    void this.router.navigateByUrl('/login');
   }
 
   formatAmount(value: number): string {

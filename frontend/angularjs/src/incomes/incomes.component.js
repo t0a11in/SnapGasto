@@ -2,8 +2,8 @@ import angular from 'angular';
 import { defaultIncomeDate, monthFromDate, todayIso } from '../core/date.js';
 
 const template = `
-  <sg-shell mode="personal"><section class="income-content" aria-labelledby="income-title">
-    <header class="page-header income-heading"><div><p class="eyebrow">MI DINERO</p><h1 id="income-title">Ingresos</h1><p class="muted">Registra dinero en tarjeta o efectivo y revisa el total mensual.</p></div><button class="button button-primary" type="button" ng-click="$ctrl.openCreate()">＋ Nuevo ingreso</button></header>
+  <sg-shell mode="admin"><header class="page-header"><div><p class="eyebrow">MANTENEDOR</p><h1 id="income-title">Ingresos</h1></div><span class="api-status">API conectada</span></header>
+  <section class="maintenance" aria-labelledby="income-title"><div class="panel-actions"><button class="button button-secondary" type="button" ng-click="$ctrl.load()">↻ Actualizar</button><button class="button button-primary" type="button" ng-click="$ctrl.openCreate()">＋ Nuevo ingreso</button></div>
     <section class="month-toolbar"><label class="field month-field"><span>Mes a consultar</span><input type="month" ng-model="$ctrl.selectedMonth" max="{{ $ctrl.currentMonth }}" ng-change="$ctrl.load()"></label><button class="button button-secondary" type="button" ng-click="$ctrl.load()">↻ Actualizar</button></section>
     <section class="income-summary" ng-if="$ctrl.summary"><article class="summary-card"><span>Tarjeta</span><strong>{{ $ctrl.currency($ctrl.summary.totalTarjeta) }}</strong></article><article class="summary-card"><span>Físico</span><strong>{{ $ctrl.currency($ctrl.summary.totalFisico) }}</strong></article><article class="summary-card summary-total"><span>Total del mes</span><strong>{{ $ctrl.currency($ctrl.summary.total) }}</strong></article></section>
     <p class="message message-success" ng-if="$ctrl.message" role="status">{{ $ctrl.message }}</p>

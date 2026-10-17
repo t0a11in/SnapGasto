@@ -4,13 +4,13 @@ const template = `
   <div class="app-shell" ng-class="{ 'personal-shell': $ctrl.mode === 'personal' }">
     <aside class="sidebar" ng-if="$ctrl.mode === 'admin'">
       <a class="brand" href="#!/incomes"><span>◈</span> SnapGasto</a>
-      <p class="sidebar-caption">ADMINISTRACIÓN</p>
+      <p class="sidebar-caption">{{ $ctrl.session.isAdmin() ? 'ADMINISTRACIÓN' : 'MI DINERO' }}</p>
       <nav aria-label="Mantenedores">
-        <a href="#!/admin/users">👥 Usuarios</a>
-        <a href="#!/admin/expenses">▣ Gastos</a>
+        <a ng-if="$ctrl.session.isAdmin()" href="#!/admin/users">👥 Usuarios</a>
+        <a ng-if="$ctrl.session.isAdmin()" href="#!/admin/expenses">▣ Gastos</a>
         <a href="#!/incomes">↗ Ingresos</a>
-        <a href="#!/admin/categories">◉ Categorías</a>
-        <a href="#!/admin/notifications">✉ Notificaciones</a>
+        <a ng-if="$ctrl.session.isAdmin()" href="#!/admin/categories">◉ Categorías</a>
+        <a ng-if="$ctrl.session.isAdmin()" href="#!/admin/notifications">✉ Notificaciones</a>
       </nav>
       <section class="account-summary" ng-if="$ctrl.session.current() as activeSession">
         <strong>{{ activeSession.user.fullName }}</strong><span>{{ activeSession.user.email }}</span>

@@ -1,23 +1,10 @@
-<main class="income-layout">
-  <header class="income-topbar">
-    <a class="brand" routerLink="/incomes"><span>◈</span> SnapGasto</a>
-    <div class="income-user-actions">
-      @if (sessionStore.isAdmin()) {
-        <a class="button button-secondary" routerLink="/admin">Administración</a>
-      }
-      <button class="button button-link" type="button" (click)="logout()">Cerrar sesión</button>
-    </div>
-  </header>
+<header class="page-header">
+  <div><p class="eyebrow">MANTENEDOR</p><h1 id="income-title">Ingresos</h1></div>
+  <span class="api-status">API conectada</span>
+</header>
 
-  <section class="income-content" aria-labelledby="income-title">
-    <header class="page-header income-heading">
-      <div>
-        <p class="eyebrow">MI DINERO</p>
-        <h1 id="income-title">Ingresos</h1>
-        <p class="muted">Registra lo que recibes en tarjeta o efectivo y revisa el total mensual.</p>
-      </div>
-      <button class="button button-primary" type="button" (click)="openCreate()">＋ Nuevo ingreso</button>
-    </header>
+<section class="maintenance" aria-labelledby="income-title">
+    <div class="panel-actions"><button class="button button-secondary" type="button" (click)="load()">↻ Actualizar</button><button class="button button-primary" type="button" (click)="openCreate()">＋ Nuevo ingreso</button></div>
 
     <section class="month-toolbar" aria-label="Filtro mensual">
       <label class="field month-field">
@@ -55,8 +42,7 @@
         }
       </tbody></table></div>
     }
-  </section>
-</main>
+</section>
 
 @if (editing() !== undefined) {
   <div class="modal-backdrop" role="presentation" (mousedown)="closeModal()"><section class="modal income-modal" role="dialog" aria-modal="true" [attr.aria-label]="editing() ? 'Editar ingreso' : 'Nuevo ingreso'" (mousedown)="$event.stopPropagation()">
