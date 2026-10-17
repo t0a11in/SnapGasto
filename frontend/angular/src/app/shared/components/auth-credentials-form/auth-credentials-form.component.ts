@@ -1,5 +1,5 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, computed, input, output, signal } from '@angular/core';
+import { email, form, FormField, maxLength, minLength, required } from '@angular/forms/signals';
 
 export type AuthFormMode = 'login' | 'register';
 
@@ -14,13 +14,11 @@ const REMEMBERED_EMAIL_KEY = 'snapgasto.auth.remembered-email';
 
 @Component({
   selector: 'app-auth-credentials-form',
-  imports: [ReactiveFormsModule],
+  imports: [FormField],
   templateUrl: './auth-credentials-form.component.html',
   styleUrl: './auth-credentials-form.component.css',
 })
 export class AuthCredentialsFormComponent {
-  private readonly formBuilder = inject(FormBuilder).nonNullable;
-
   readonly mode = input<AuthFormMode>('login');
   readonly loading = input(false);
   readonly errorMessage = input('');
@@ -29,23 +27,38 @@ export class AuthCredentialsFormComponent {
 
   readonly submitLabel = computed(() => this.mode() === 'register' ? 'Crear cuenta' : 'Ingresar');
   readonly passwordAutocomplete = computed(() => this.mode() === 'register' ? 'new-password' : 'current-password');
-  readonly form = this.formBuilder.group({
-    fullName: ['', Validators.maxLength(120)],
-    email: [this.rememberedEmail(), [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(100)]],
-    rememberPassword: [Boolean(this.rememberedEmail())],
+  readonly credentials = signal<AuthCredentials>({
+    fullName: '',
+    email: this.rememberedEmail(),
+    password: '',
+    rememberPassword: Boolean(this.rememberedEmail()),
   });
+  readonly credentialsForm = form(this.credentials, (schemaPath) => {
+    maxLength(schemaPath.fullName, 120, { message: 'El nombre puede tener hasta 120 caracteres.' });
+    required(schemaPath.fullName, {
+      when: () => this.mode() === 'register',
+      message: 'Ingresa tu nombre completo.',
+    });
+    required(schemaPath.email, { message: 'Ingresa tu correo electrónico.' });
+    email(schemaPath.email, { message: 'Ingresa un correo electrónico válido.' });
+    required(schemaPath.password, { message: 'Ingresa tu contraseña.' });
+    minLength(schemaPath.password, 8, { message: 'La contraseña debe tener entre 8 y 100 caracteres.' });
+    maxLength(schemaPath.password, 100, { message: 'La contraseña debe tener entre 8 y 100 caracteres.' });
+  });
+  readonly fullNameRequired = computed(() => this.mode() === 'register' && !this.credentials().fullName.trim());
+  readonly canSubmit = computed(() => this.credentialsForm().valid() && !this.fullNameRequired());
 
   togglePasswordVisibility(): void {
     this.passwordVisible.update((visible) => !visible);
   }
 
   submit(): void {
-    const value = this.form.getRawValue();
-    const requiresName = this.mode() === 'register' && !value.fullName.trim();
+    const value = this.credentials();
 
-    if (this.form.invalid || requiresName) {
-      this.form.markAllAsTouched();
+    if (!this.canSubmit()) {
+      this.credentialsForm.fullName().markAsTouched();
+      this.credentialsForm.email().markAsTouched();
+      this.credentialsForm.password().markAsTouched();
       return;
     }
 

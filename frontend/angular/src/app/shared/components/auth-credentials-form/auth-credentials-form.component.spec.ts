@@ -10,7 +10,7 @@ describe('AuthCredentialsFormComponent', () => {
     const component = fixture.componentInstance;
     const submitted = jasmine.createSpy('submitted');
     component.submitted.subscribe(submitted);
-    component.form.setValue({
+    component.credentials.set({
       fullName: '',
       email: 'ana@example.com',
       password: 'secreto123',
@@ -41,5 +41,5 @@ describe('AuthCredentialsFormComponent', () => {
 });
 
 function componentPasswordInput(fixture: ComponentFixture<AuthCredentialsFormComponent>): HTMLInputElement {
-  return fixture.nativeElement.querySelector('input[name="password"]') as HTMLInputElement;
+  return fixture.nativeElement.querySelector('input[type="password"], input[type="text"]') as HTMLInputElement;
 }

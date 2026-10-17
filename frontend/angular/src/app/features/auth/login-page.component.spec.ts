@@ -48,7 +48,7 @@ describe('1) Login COMPONENT', () => {
     const fixture = TestBed.createComponent(LoginPageComponent);
     fixture.detectChanges();
     const form = credentialsForm(fixture);
-    form.form.setValue({ fullName: '', email: 'ana@example.com', password: 'secreto123', rememberPassword: false });
+    form.credentials.set({ fullName: '', email: 'ana@example.com', password: 'secreto123', rememberPassword: false });
     form.submit();
     expect(authApi.login).toHaveBeenCalledWith({ email: 'ana@example.com', password: 'secreto123' });
     expect(router.navigateByUrl).toHaveBeenCalledWith('/admin/incomes');
@@ -57,7 +57,7 @@ describe('1) Login COMPONENT', () => {
   it('Disabled button only email', () => {
     const fixture = TestBed.createComponent(LoginPageComponent);
     fixture.detectChanges();
-    credentialsForm(fixture).form.setValue({ fullName: '', email: 'ana@example.com', password: '', rememberPassword: false });
+    credentialsForm(fixture).credentials.set({ fullName: '', email: 'ana@example.com', password: '', rememberPassword: false });
     fixture.detectChanges();
     const button = fixture.nativeElement.querySelector(
       'button[type="submit"]'
@@ -69,7 +69,7 @@ describe('1) Login COMPONENT', () => {
   it('Disabled button not real email', () => {
     const fixture = TestBed.createComponent(LoginPageComponent);
     fixture.detectChanges();
-    credentialsForm(fixture).form.setValue({ fullName: '', email: 'xxx.xxxx.com', password: 'xxxx', rememberPassword: false });
+    credentialsForm(fixture).credentials.set({ fullName: '', email: 'xxx.xxxx.com', password: 'xxxx', rememberPassword: false });
     fixture.detectChanges();
     const button = fixture.nativeElement.querySelector(
       'button[type="submit"]'
@@ -81,7 +81,7 @@ describe('1) Login COMPONENT', () => {
   it('Not disabled button', () => {
     const fixture = TestBed.createComponent(LoginPageComponent);
     fixture.detectChanges();
-    credentialsForm(fixture).form.setValue({ fullName: '', email: 'xxxx@xxxx.com', password: '1234567890', rememberPassword: false });
+    credentialsForm(fixture).credentials.set({ fullName: '', email: 'xxxx@xxxx.com', password: '1234567890', rememberPassword: false });
     fixture.detectChanges();
 
     const button = fixture.nativeElement.querySelector(
