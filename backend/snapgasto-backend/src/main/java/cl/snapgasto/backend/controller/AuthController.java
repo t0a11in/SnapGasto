@@ -38,6 +38,10 @@ public class AuthController {
     public AuthResponse login(@Valid @RequestBody AuthRequest request) {
         return authService.login(request);
     }
+    @PostMapping("v1/login")
+    public AuthResponse login_v1(@Valid @RequestBody AuthRequest request) {
+        return authService.login(request);
+    }
 
     @PostMapping("/google")
     public AuthResponse loginWithGoogle(@Valid @RequestBody FirebaseLoginRequest request) {
