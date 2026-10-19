@@ -50,3 +50,6 @@ frontend/angular/.angular21-backup-*/
 # Language caches
 __pycache__/
 *.py[cod]
+
+
+/docs
