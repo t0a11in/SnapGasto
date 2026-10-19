@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../controllers/auth_controller.dart';
@@ -13,7 +10,7 @@ import '../core/constants/app_strings.dart';
 import '../core/widgets/app_loading_view.dart';
 import '../data/models/expense.dart';
 import 'income_page.dart';
-import 'widgets/expense_table.dart';
+import 'expense_page.dart';
 
 /// Presenta el dashboard, el listado de gastos y el perfil del usuario autenticado.
 class HomePage extends StatefulWidget {
@@ -42,7 +39,7 @@ class _HomePageState extends State<HomePage> {
         expenseController: _expenseController,
         incomeController: _incomeController,
       ),
-      _ExpenseList(expenseController: _expenseController),
+      ExpensePage(controller: _expenseController),
       IncomePage(controller: _incomeController),
       const _Profile(),
     ];
@@ -51,7 +48,8 @@ class _HomePageState extends State<HomePage> {
       body: pages[_selectedIndex],
       floatingActionButton: switch (_selectedIndex) {
         1 => FloatingActionButton.extended(
-          onPressed: () => _showAddExpense(context),
+          onPressed: () =>
+              showExpenseEditor(context, controller: _expenseController),
           icon: const Icon(Icons.add),
           label: const Text(AppStrings.addExpense),
         ),
@@ -99,13 +97,6 @@ class _HomePageState extends State<HomePage> {
     AppStrings.incomes,
     AppStrings.profile,
   ][index];
-
-  Future<void> _showAddExpense(BuildContext context) =>
-      showModalBottomSheet<void>(
-        context: context,
-        isScrollControlled: true,
-        builder: (_) => _AddExpenseSheet(controller: _expenseController),
-      );
 }
 
 class _Dashboard extends StatelessWidget {
@@ -168,88 +159,6 @@ class _Dashboard extends StatelessWidget {
       );
     }),
   );
-}
-
-class _ExpenseList extends StatelessWidget {
-  const _ExpenseList({required this.expenseController});
-
-  final ExpenseController expenseController;
-
-  @override
-  Widget build(BuildContext context) => RefreshIndicator(
-    onRefresh: expenseController.load,
-    child: Obx(() {
-      if (expenseController.isLoading.value &&
-          expenseController.expenses.isEmpty) {
-        return const AppLoadingView();
-      }
-      if (expenseController.errorMessage.isNotEmpty) {
-        return _ErrorMessage(
-          message: expenseController.errorMessage.value,
-          onRetry: expenseController.load,
-        );
-      }
-      if (expenseController.expenses.isEmpty) return const _EmptyExpenses();
-      return SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
-        child: ExpenseTable(
-          expenses: expenseController.expenses,
-          onViewReceipt: (expense) => _showReceipt(context, expense),
-          onDelete: (expense) => _confirmDeletion(context, expense),
-        ),
-      );
-    }),
-  );
-
-  Future<void> _confirmDeletion(BuildContext context, Expense expense) async {
-    final shouldDelete = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text(AppStrings.deleteExpenseTitle),
-        content: const Text(AppStrings.deleteExpenseBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text(AppStrings.cancel),
-          ),
-          FilledButton.tonal(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(foregroundColor: AppColors.danger),
-            child: const Text(AppStrings.delete),
-          ),
-        ],
-      ),
-    );
-    if (shouldDelete ?? false) await expenseController.remove(expense.id);
-  }
-
-  Future<void> _showReceipt(BuildContext context, Expense expense) async {
-    final receiptPath = expense.receiptLocalPath;
-    if (receiptPath == null) return;
-    await showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Boleta local'),
-        content: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 520, maxHeight: 560),
-          child: Image.file(
-            File(receiptPath),
-            fit: BoxFit.contain,
-            errorBuilder: (_, _, _) => const Text(
-              'La imagen ya no está disponible en este dispositivo.',
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cerrar'),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _Profile extends StatelessWidget {
@@ -341,7 +250,7 @@ class _ExpenseTile extends StatelessWidget {
       leading: const CircleAvatar(child: Icon(Icons.receipt)),
       title: Text(expense.category),
       subtitle: Text(
-        '${DateFormat.yMMMd('es_CL').format(expense.date)} · ${expense.description ?? expense.paymentMethod}',
+        '${DateFormat.yMMMd('es_CL').format(expense.date)} · ${expense.description ?? expense.paymentMethod.label}',
       ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -416,225 +325,6 @@ class _ErrorMessage extends StatelessWidget {
       ),
     ),
   );
-}
-
-class _AddExpenseSheet extends StatefulWidget {
-  const _AddExpenseSheet({required this.controller});
-
-  final ExpenseController controller;
-
-  @override
-  State<_AddExpenseSheet> createState() => _AddExpenseSheetState();
-}
-
-class _AddExpenseSheetState extends State<_AddExpenseSheet> {
-  final _formKey = GlobalKey<FormState>();
-  final _amountController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _imagePicker = ImagePicker();
-  DateTime _date = DateTime.now();
-  String _category = AppStrings.defaultCategory;
-  String _paymentMethod = AppStrings.defaultPaymentMethod;
-  XFile? _receipt;
-
-  @override
-  void dispose() {
-    _amountController.dispose();
-    _descriptionController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _save() async {
-    if (!_formKey.currentState!.validate()) return;
-    final didSave = await widget.controller.create(
-      amount: double.parse(_amountController.text.replaceAll(',', '.')),
-      category: _category,
-      date: _date,
-      description: _descriptionController.text.trim().isEmpty
-          ? null
-          : _descriptionController.text.trim(),
-      paymentMethod: _paymentMethod,
-      receipt: _receipt,
-    );
-    if (!mounted) return;
-    if (didSave) {
-      Navigator.pop(context);
-    } else {
-      Get.snackbar(AppStrings.addExpense, widget.controller.errorMessage.value);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.fromLTRB(
-      24,
-      24,
-      24,
-      MediaQuery.viewInsetsOf(context).bottom + 24,
-    ),
-    child: SingleChildScrollView(
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              AppStrings.addExpense,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _amountController,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              decoration: const InputDecoration(
-                labelText: AppStrings.amount,
-                prefixText: '\$ ',
-              ),
-              validator: (value) =>
-                  (double.tryParse((value ?? '').replaceAll(',', '.')) ?? 0) <=
-                      0
-                  ? AppStrings.invalidAmount
-                  : null,
-            ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<String>(
-              initialValue: _category,
-              decoration: const InputDecoration(labelText: AppStrings.category),
-              items: AppStrings.categories
-                  .map(
-                    (value) =>
-                        DropdownMenuItem(value: value, child: Text(value)),
-                  )
-                  .toList(),
-              onChanged: (value) => setState(() => _category = value!),
-            ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<String>(
-              initialValue: _paymentMethod,
-              decoration: const InputDecoration(
-                labelText: AppStrings.paymentMethod,
-              ),
-              items: AppStrings.paymentMethods
-                  .map(
-                    (value) =>
-                        DropdownMenuItem(value: value, child: Text(value)),
-                  )
-                  .toList(),
-              onChanged: (value) => setState(() => _paymentMethod = value!),
-            ),
-            const SizedBox(height: 12),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: const Text(AppStrings.date),
-              subtitle: Text(DateFormat.yMMMd('es_CL').format(_date)),
-              trailing: const Icon(Icons.calendar_today_outlined),
-              onTap: _selectDate,
-            ),
-            TextFormField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: AppStrings.description,
-              ),
-              maxLines: 2,
-            ),
-            const SizedBox(height: 12),
-            _ReceiptPicker(
-              receipt: _receipt,
-              onPick: _selectReceipt,
-              onRemove: () => setState(() => _receipt = null),
-            ),
-            const SizedBox(height: 20),
-            FilledButton(onPressed: _save, child: const Text(AppStrings.save)),
-          ],
-        ),
-      ),
-    ),
-  );
-
-  Future<void> _selectDate() async {
-    final selectedDate = await showDatePicker(
-      context: context,
-      initialDate: _date,
-      firstDate: DateTime(2020),
-      lastDate: DateTime.now(),
-    );
-    if (selectedDate != null) setState(() => _date = selectedDate);
-  }
-
-  Future<void> _selectReceipt() async {
-    final source = await showModalBottomSheet<ImageSource>(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Wrap(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.camera_alt_outlined),
-              title: const Text('Tomar foto'),
-              onTap: () => Navigator.pop(context, ImageSource.camera),
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('Seleccionar del dispositivo'),
-              onTap: () => Navigator.pop(context, ImageSource.gallery),
-            ),
-          ],
-        ),
-      ),
-    );
-    if (source == null) return;
-    final receipt = await _imagePicker.pickImage(
-      source: source,
-      imageQuality: 88,
-    );
-    if (receipt != null && mounted) setState(() => _receipt = receipt);
-  }
-}
-
-class _ReceiptPicker extends StatelessWidget {
-  const _ReceiptPicker({
-    required this.receipt,
-    required this.onPick,
-    required this.onRemove,
-  });
-
-  final XFile? receipt;
-  final VoidCallback onPick;
-  final VoidCallback onRemove;
-
-  @override
-  Widget build(BuildContext context) {
-    if (receipt == null) {
-      return OutlinedButton.icon(
-        onPressed: onPick,
-        icon: const Icon(Icons.add_a_photo_outlined),
-        label: const Text('Adjuntar boleta (opcional)'),
-      );
-    }
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: ClipRRect(
-        borderRadius: BorderRadius.circular(4),
-        child: Image.file(
-          File(receipt!.path),
-          width: 52,
-          height: 52,
-          fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => const Icon(Icons.broken_image_outlined),
-        ),
-      ),
-      title: const Text('Boleta adjunta'),
-      subtitle: const Text('Se guardará solamente en este dispositivo.'),
-      trailing: IconButton(
-        tooltip: 'Quitar boleta',
-        onPressed: onRemove,
-        icon: const Icon(Icons.close),
-      ),
-      onTap: onPick,
-    );
-  }
 }
 
 String _currency(double amount) =>

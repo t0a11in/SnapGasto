@@ -7,8 +7,11 @@ class ExpenseRepository {
 
   final ApiClient _apiClient;
 
-  Future<List<Expense>> list() async {
-    final response = await _apiClient.dio.get<List<dynamic>>('/expenses');
+  Future<List<Expense>> list(DateTime month) async {
+    final response = await _apiClient.dio.get<List<dynamic>>(
+      '/expenses/v1/listar',
+      queryParameters: {'month': _monthKey(month)},
+    );
     return response.data!
         .cast<Map<String, dynamic>>()
         .map(Expense.fromJson)
@@ -22,27 +25,60 @@ class ExpenseRepository {
     String? description,
     required String paymentMethod,
   }) async {
-
-    print({
-        'amount': amount,
-        'category': category,
-        'date': date.toIso8601String().split('T').first,
-        'description': description,
-        'paymentMethod': paymentMethod,
-      });
     final response = await _apiClient.dio.post<Map<String, dynamic>>(
-      '/expenses',
-      data: {
-        'amount': amount,
-        'category': category,
-        'date': date.toIso8601String().split('T').first,
-        'description': description,
-        'paymentMethod': paymentMethod,
-      },
+      '/expenses/v1/crear',
+      data: _payload(
+        amount: amount,
+        category: category,
+        date: date,
+        description: description,
+        paymentMethod: paymentMethod,
+      ),
+    );
+    return Expense.fromJson(response.data!);
+  }
+
+  Future<Expense> update({
+    required String id,
+    required double amount,
+    required String category,
+    required DateTime date,
+    String? description,
+    required String paymentMethod,
+  }) async {
+    final response = await _apiClient.dio.put<Map<String, dynamic>>(
+      '/expenses/v1/$id/actualizar',
+      data: _payload(
+        amount: amount,
+        category: category,
+        date: date,
+        description: description,
+        paymentMethod: paymentMethod,
+      ),
     );
     return Expense.fromJson(response.data!);
   }
 
   Future<void> delete(String id) =>
-      _apiClient.dio.delete<void>('/expenses/$id');
+      _apiClient.dio.delete<void>('/expenses/v1/$id/eliminar');
+
+  Map<String, dynamic> _payload({
+    required double amount,
+    required String category,
+    required DateTime date,
+    String? description,
+    required String paymentMethod,
+  }) => {
+    'amount': amount,
+    'category': category.trim(),
+    'date': _dateKey(date),
+    'description': description,
+    'paymentMethod': paymentMethod,
+  };
+
+  String _monthKey(DateTime value) =>
+      '${value.year.toString().padLeft(4, '0')}-${value.month.toString().padLeft(2, '0')}';
+
+  String _dateKey(DateTime value) =>
+      '${value.year.toString().padLeft(4, '0')}-${value.month.toString().padLeft(2, '0')}-${value.day.toString().padLeft(2, '0')}';
 }

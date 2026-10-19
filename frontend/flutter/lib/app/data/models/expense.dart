@@ -1,3 +1,27 @@
+/// Medios de pago que expone el mantenedor versionado de gastos.
+enum ExpensePaymentMethod {
+  tarjeta('TARJETA', 'Tarjeta'),
+  efectivo('EFECTIVO', 'Efectivo'),
+  transferencia('TRANSFERENCIA', 'Transferencia'),
+  otro('OTRO', 'Otro');
+
+  const ExpensePaymentMethod(this.apiValue, this.label);
+
+  final String apiValue;
+  final String label;
+
+  /// También acepta valores de instalaciones que usaban etiquetas antes de v1.
+  static ExpensePaymentMethod fromApiValue(String value) {
+    final normalized = value.trim().toUpperCase();
+    return ExpensePaymentMethod.values.firstWhere(
+      (method) =>
+          method.apiValue == normalized ||
+          method.label.toUpperCase() == normalized,
+      orElse: () => ExpensePaymentMethod.otro,
+    );
+  }
+}
+
 /// Describe un gasto manual persistido en la API.
 class Expense {
   const Expense({
@@ -15,7 +39,7 @@ class Expense {
   final String category;
   final DateTime date;
   final String? description;
-  final String paymentMethod;
+  final ExpensePaymentMethod paymentMethod;
 
   /// Ruta privada del comprobante; no forma parte del JSON del backend.
   final String? receiptLocalPath;
@@ -26,7 +50,9 @@ class Expense {
     category: json['category'] as String,
     date: DateTime.parse(json['date'] as String),
     description: json['description'] as String?,
-    paymentMethod: json['paymentMethod'] as String,
+    paymentMethod: ExpensePaymentMethod.fromApiValue(
+      json['paymentMethod'] as String,
+    ),
   );
 
   Expense copyWith({String? receiptLocalPath}) => Expense(

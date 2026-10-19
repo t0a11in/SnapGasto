@@ -28,8 +28,6 @@ class _AuthPageState extends State<AuthPage> {
   @override
   void initState() {
     super.initState();
-        _emailController.text= "test@uno.cl";
-    _passwordController.text= "Cuatico1234*";
     _backendTarget = Get.find<BackendTargetStore>().current;
   }
 

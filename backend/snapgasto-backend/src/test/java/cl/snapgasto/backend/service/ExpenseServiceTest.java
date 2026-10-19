@@ -88,6 +88,20 @@ class ExpenseServiceTest {
     }
 
     @Test
+    void listsOnlyExpensesFromTheRequestedMonthForTheAuthenticatedUser() {
+        Expense octoberExpense = expense("Supermercado", LocalDate.of(2026, 10, 8));
+        when(expenseRepository.findAllByUserAndDateBetweenOrderByDateDescCreatedAtDesc(
+                user, LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 31)))
+                .thenReturn(List.of(octoberExpense));
+
+        List<ExpenseResponse> response = expenseService.listFor(user, "2026-10");
+
+        assertEquals(List.of("Supermercado"), response.stream().map(ExpenseResponse::description).toList());
+        verify(expenseRepository).findAllByUserAndDateBetweenOrderByDateDescCreatedAtDesc(
+                user, LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 31));
+    }
+
+    @Test
     void deletesOnlyAnExpenseBelongingToTheAuthenticatedUser() {
         UUID expenseId = UUID.randomUUID();
         Expense expense = expense("Café", LocalDate.now());
@@ -107,6 +121,25 @@ class ExpenseServiceTest {
                 () -> expenseService.delete(expenseId, user));
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+    }
+
+    @Test
+    void updatesOnlyAnExpenseBelongingToTheAuthenticatedUser() {
+        UUID expenseId = UUID.randomUUID();
+        Expense expense = expense("Café", LocalDate.of(2026, 10, 8));
+        ExpenseRequest request = new ExpenseRequest(
+                new BigDecimal("8500"), " Transporte ", LocalDate.of(2026, 10, 9), "  Metro  ", " EFECTIVO ");
+        when(expenseRepository.findByIdAndUser(expenseId, user)).thenReturn(Optional.of(expense));
+        when(expenseRepository.save(expense)).thenReturn(expense);
+
+        ExpenseResponse response = expenseService.update(expenseId, request, user);
+
+        assertEquals(new BigDecimal("8500"), response.amount());
+        assertEquals("Transporte", response.category());
+        assertEquals(LocalDate.of(2026, 10, 9), response.date());
+        assertEquals("Metro", response.description());
+        assertEquals("EFECTIVO", response.paymentMethod());
+        verify(expenseRepository).save(expense);
     }
 
     private Expense expense(String description, LocalDate date) {
