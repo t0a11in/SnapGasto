@@ -1,0 +1,10 @@
+<td [attr.colspan]="colspan()" class="text-center py-5">
+  @if (loading()) {
+    <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Cargando…
+  } @else if (error()) {
+    <span class="text-danger">{{ error() }}</span>
+    <button type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="retry.emit()">Reintentar</button>
+  } @else {
+    <span class="text-body-secondary">{{ emptyText() }}</span>
+  }
+</td>

@@ -1,0 +1,9 @@
+<div class="card stat-card h-100">
+  <div class="card-body">
+    <div class="text-body-secondary small">Total gastado</div>
+    <div class="fs-3 fw-bold text-danger">{{ total() | money }}</div>
+    <div class="small text-body-secondary">
+      {{ count() | thousands }} movimiento(s) · {{ categories() | thousands }} categoría(s)
+    </div>
+  </div>
+</div>

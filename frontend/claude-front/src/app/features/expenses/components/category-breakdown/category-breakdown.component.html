@@ -1,0 +1,42 @@
+<div class="breakdown-card" [class.card]="showHeader()" [class.stat-card]="showHeader()" [class.h-100]="showHeader()">
+  <div [class.card-body]="showHeader()" class="d-flex flex-column">
+    @if (showHeader()) {
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="text-body-secondary small">Por categoría</span>
+        @if (rows().length) {
+          <button type="button" class="btn btn-sm btn-link p-0 d-flex align-items-center gap-1" (click)="expand.emit()">
+            <app-icon name="maximize-2" [size]="14" /> Ver todas ({{ rows().length }})
+          </button>
+        }
+      </div>
+    }
+
+    @if (rows().length) {
+      <ul class="list-unstyled mb-0 breakdown" [class.has-more]="hasMore()"
+        [style.max-height.rem]="maxHeight()" aria-label="Gastos por categoría">
+        @for (row of rows(); track row.category) {
+          <li>
+            <button type="button" class="breakdown-row" (click)="selectCategory.emit(row.category)"
+              [attr.aria-label]="'Ver gastos de ' + row.category">
+              <span class="d-flex align-items-center gap-2 text-truncate">
+                <span class="cat-dot" [style.background]="color(row)" aria-hidden="true"></span>
+                <span class="text-truncate">{{ row.category }}</span>
+                <span class="text-body-secondary small">({{ row.count }})</span>
+              </span>
+              <span class="d-flex align-items-center gap-2 text-nowrap">
+                <span class="text-body-secondary small">{{ row.share | percent1 }}</span>
+                <span class="fw-semibold">{{ row.total | money }}</span>
+                <app-icon name="chevron-right" [size]="14" class="text-body-secondary" />
+              </span>
+            </button>
+          </li>
+        }
+      </ul>
+      @if (hasMore()) {
+        <div class="small text-body-secondary mt-1">Desliza para ver {{ rows().length - (visibleRows() ?? 0) }} más</div>
+      }
+    } @else {
+      <div class="small text-body-secondary">Sin gastos en este mes.</div>
+    }
+  </div>
+</div>

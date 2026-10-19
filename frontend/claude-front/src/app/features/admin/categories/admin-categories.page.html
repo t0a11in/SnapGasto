@@ -1,0 +1,43 @@
+<app-admin-page-header title="Categorías" subtitle="Clasificación disponible para los gastos." createLabel="Nueva categoría"
+  (create)="openForm()" (refresh)="store.load()" />
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <caption class="visually-hidden">Categorías</caption>
+      <thead class="table-light">
+        <tr>
+          <th scope="col">Categoría</th><th scope="col">Ícono</th><th scope="col">Color</th>
+          <th scope="col" class="text-end"><span class="visually-hidden">Acciones</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of sorted(); track c.id) {
+          <tr>
+            <td>
+              <span class="d-inline-flex align-items-center gap-2 fw-semibold">
+                <span class="cat-chip" [style.background]="c.colorHex || 'var(--bs-secondary)'" aria-hidden="true">
+                  @if (c.icon) { <app-icon [name]="c.icon" [size]="14" /> }
+                </span>
+                {{ c.name }}
+              </span>
+            </td>
+            <td class="text-body-secondary">{{ c.icon || '—' }}</td>
+            <td class="text-body-secondary font-monospace">{{ c.colorHex || '—' }}</td>
+            <td class="text-end text-nowrap">
+              <button type="button" class="btn btn-sm btn-link text-body" (click)="openForm(c)" [attr.aria-label]="'Editar ' + c.name">
+                <app-icon name="edit-2" [size]="16" />
+              </button>
+              <button type="button" class="btn btn-sm btn-link text-danger" (click)="remove(c)" [attr.aria-label]="'Eliminar ' + c.name">
+                <app-icon name="trash-2" [size]="16" />
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr appTableState [colspan]="4" [loading]="store.loading()" [error]="store.error()"
+            emptyText="No hay categorías." (retry)="store.load()"></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,20 @@
+<div class="modal-header">
+  <div>
+    <h2 class="modal-title h5 mb-0" id="category-expenses-title">{{ category() }}</h2>
+    <div class="small text-body-secondary">
+      {{ month() }} · {{ items().length | thousands }} gasto(s) · Total <strong class="text-body">{{ total() | money }}</strong>
+    </div>
+  </div>
+  <button type="button" class="btn-close" aria-label="Cerrar" (click)="activeModal.dismiss()"></button>
+</div>
+<div class="modal-body p-0">
+  <app-expenses-table
+    [items]="items()"
+    [showActions]="false"
+    [showCategory]="false"
+    [caption]="'Gastos de ' + category()"
+  />
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.close()">Cerrar</button>
+</div>

@@ -1,0 +1,52 @@
+<app-admin-page-header title="Notificaciones" subtitle="Mensajes enviados a los usuarios."
+  createLabel="Nueva notificación" (create)="openForm()" (refresh)="reload()">
+  <select class="form-select filter" aria-label="Filtrar por estado" [value]="readFilter()"
+    (change)="readFilter.set($any($event.target).value)">
+    <option value="all">Todas</option>
+    <option value="unread">No leídas</option>
+    <option value="read">Leídas</option>
+  </select>
+</app-admin-page-header>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <caption class="visually-hidden">Notificaciones</caption>
+      <thead class="table-light">
+        <tr>
+          <th scope="col">Fecha</th><th scope="col">Destinatario</th><th scope="col">Título</th>
+          <th scope="col">Estado</th><th scope="col" class="text-end"><span class="visually-hidden">Acciones</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (n of filtered(); track n.id) {
+          <tr>
+            <td class="text-nowrap">{{ n.createdAt | date: 'dd-MM-yyyy HH:mm' }}</td>
+            <td>{{ n.userName }}</td>
+            <td>
+              <div class="fw-semibold">{{ n.title }}</div>
+              <div class="small text-body-secondary text-truncate body-preview">{{ n.body }}</div>
+            </td>
+            <td>
+              <button type="button" class="btn btn-sm" [class]="n.read ? 'btn-outline-secondary' : 'btn-outline-primary'"
+                (click)="toggleRead(n)" [attr.aria-label]="n.read ? 'Marcar como no leída' : 'Marcar como leída'">
+                {{ n.read ? 'Leída' : 'No leída' }}
+              </button>
+            </td>
+            <td class="text-end text-nowrap">
+              <button type="button" class="btn btn-sm btn-link text-body" (click)="openForm(n)" aria-label="Editar notificación">
+                <app-icon name="edit-2" [size]="16" />
+              </button>
+              <button type="button" class="btn btn-sm btn-link text-danger" (click)="remove(n)" aria-label="Eliminar notificación">
+                <app-icon name="trash-2" [size]="16" />
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr appTableState [colspan]="5" [loading]="store.loading()" [error]="store.error()"
+            emptyText="No hay notificaciones." (retry)="store.load()"></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

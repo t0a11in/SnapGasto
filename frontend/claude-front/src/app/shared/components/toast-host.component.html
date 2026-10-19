@@ -1,0 +1,15 @@
+<div class="toast-container position-fixed bottom-0 end-0 p-3" aria-live="polite" aria-atomic="false">
+  @for (toast of toasts.toasts(); track toast.id) {
+    <div class="toast show align-items-center border-0" [class]="'text-bg-' + toast.type" role="status">
+      <div class="d-flex">
+        <div class="toast-body">{{ toast.text }}</div>
+        <button
+          type="button"
+          class="btn-close btn-close-white me-2 m-auto"
+          aria-label="Cerrar"
+          (click)="toasts.dismiss(toast.id)"
+        ></button>
+      </div>
+    </div>
+  }
+</div>

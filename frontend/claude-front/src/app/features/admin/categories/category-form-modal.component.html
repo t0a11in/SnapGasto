@@ -1,0 +1,47 @@
+<form novalidate (submit)="onSubmit($event)">
+  <div class="modal-header">
+    <h2 class="modal-title h5" id="category-modal-title">{{ editingId() ? 'Editar categoría' : 'Nueva categoría' }}</h2>
+    <button type="button" class="btn-close" aria-label="Cerrar" (click)="activeModal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    @if (serverError()) {
+      <div class="alert alert-danger py-2" role="alert">{{ serverError() }}</div>
+    }
+    <div class="mb-3">
+      <label class="form-label" for="category-name">Nombre</label>
+      <input id="category-name" type="text" class="form-control"
+        [class.is-invalid]="categoryForm.name().touched() && categoryForm.name().invalid()"
+        [formField]="categoryForm.name" />
+      <app-field-errors [field]="categoryForm.name" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="category-icon">Ícono <span class="text-body-secondary">(opcional, nombre Feather)</span></label>
+      <div class="input-group">
+        <span class="input-group-text" aria-hidden="true">
+          @if (iconValid()) { <app-icon [name]="model().icon" /> } @else { <app-icon name="help-circle" /> }
+        </span>
+        <input id="category-icon" type="text" class="form-control" list="feather-icons"
+          placeholder="shopping-cart" [formField]="categoryForm.icon" />
+      </div>
+      <datalist id="feather-icons">
+        @for (n of iconNames; track n) { <option [value]="n"></option> }
+      </datalist>
+      <app-field-errors [field]="categoryForm.icon" />
+    </div>
+    <div class="mb-1">
+      <label class="form-label" for="category-color">Color <span class="text-body-secondary">(opcional, #RRGGBB)</span></label>
+      <div class="input-group has-validation">
+        <input type="color" class="form-control form-control-color" aria-label="Elegir color"
+          [value]="colorPickerValue()" (input)="setColor($any($event.target).value)" />
+        <input id="category-color" type="text" class="form-control" placeholder="#22C55E"
+          [class.is-invalid]="categoryForm.colorHex().touched() && categoryForm.colorHex().invalid()"
+          [formField]="categoryForm.colorHex" />
+        <app-field-errors [field]="categoryForm.colorHex" />
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">Cancelar</button>
+    <button type="submit" class="btn btn-primary" [disabled]="categoryForm().submitting()">Guardar</button>
+  </div>
+</form>

@@ -1,0 +1,41 @@
+<app-admin-page-header title="Usuarios" subtitle="Cuentas registradas y sus roles." createLabel="Nuevo usuario"
+  (create)="openForm()" (refresh)="store.load()">
+  <input type="search" class="form-control search" placeholder="Buscar…" aria-label="Buscar usuarios"
+    [value]="query()" (input)="query.set($any($event.target).value)" />
+</app-admin-page-header>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <caption class="visually-hidden">Usuarios</caption>
+      <thead class="table-light">
+        <tr>
+          <th scope="col">Nombre</th><th scope="col">Correo</th><th scope="col">Rol</th>
+          <th scope="col">Creado</th><th scope="col" class="text-end"><span class="visually-hidden">Acciones</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (u of filtered(); track u.id) {
+          <tr>
+            <td class="fw-semibold">{{ u.fullName }}</td>
+            <td>{{ u.email }}</td>
+            <td><span class="badge" [class]="u.role === 'ADMIN' ? 'text-bg-primary' : 'text-bg-light border'">{{ u.role }}</span></td>
+            <td class="text-nowrap">{{ u.createdAt | date: 'dd-MM-yyyy' }}</td>
+            <td class="text-end text-nowrap">
+              <button type="button" class="btn btn-sm btn-link text-body" (click)="openForm(u)" [attr.aria-label]="'Editar ' + u.fullName">
+                <app-icon name="edit-2" [size]="16" />
+              </button>
+              <button type="button" class="btn btn-sm btn-link text-danger" [disabled]="u.id === currentUserId()"
+                (click)="remove(u)" [attr.aria-label]="'Eliminar ' + u.fullName">
+                <app-icon name="trash-2" [size]="16" />
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr appTableState [colspan]="5" [loading]="store.loading()" [error]="store.error()"
+            emptyText="No hay usuarios." (retry)="store.load()"></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

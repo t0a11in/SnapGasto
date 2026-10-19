@@ -1,0 +1,52 @@
+<app-admin-page-header title="Gastos de usuarios" subtitle="Todos los gastos registrados en la plataforma."
+  createLabel="Nuevo gasto" (create)="openForm()" (refresh)="reload()">
+  <select class="form-select filter" aria-label="Filtrar por usuario" [value]="userFilter()"
+    (change)="userFilter.set($any($event.target).value)">
+    <option value="">Todos los usuarios</option>
+    @for (u of users.items(); track u.id) { <option [value]="u.id">{{ u.fullName }}</option> }
+  </select>
+  <input type="month" class="form-control filter" aria-label="Filtrar por mes" [value]="monthFilter()"
+    (change)="monthFilter.set($any($event.target).value)" />
+</app-admin-page-header>
+
+<p class="text-body-secondary small">
+  {{ filtered().length }} gasto(s) · Total {{ filteredTotal() | money }}
+</p>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <caption class="visually-hidden">Gastos de usuarios</caption>
+      <thead class="table-light">
+        <tr>
+          <th scope="col">Fecha</th><th scope="col">Usuario</th><th scope="col">Categoría</th>
+          <th scope="col">Descripción</th><th scope="col">Medio</th><th scope="col" class="text-end">Monto</th>
+          <th scope="col" class="text-end"><span class="visually-hidden">Acciones</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (e of filtered(); track e.id) {
+          <tr>
+            <td class="text-nowrap">{{ e.date | date: 'dd-MM-yyyy' }}</td>
+            <td>{{ e.userName }}</td>
+            <td>{{ e.category }}</td>
+            <td>{{ e.description || '—' }}</td>
+            <td><span class="badge text-bg-light border">{{ paymentLabel(e.paymentMethod) }}</span></td>
+            <td class="text-end fw-semibold text-nowrap">{{ e.amount | money }}</td>
+            <td class="text-end text-nowrap">
+              <button type="button" class="btn btn-sm btn-link text-body" (click)="openForm(e)" aria-label="Editar gasto">
+                <app-icon name="edit-2" [size]="16" />
+              </button>
+              <button type="button" class="btn btn-sm btn-link text-danger" (click)="remove(e)" aria-label="Eliminar gasto">
+                <app-icon name="trash-2" [size]="16" />
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr appTableState [colspan]="7" [loading]="store.loading()" [error]="store.error()"
+            emptyText="No hay gastos para el filtro seleccionado." (retry)="store.load()"></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

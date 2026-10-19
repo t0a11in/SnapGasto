@@ -1,0 +1,24 @@
+<form novalidate (submit)="onSubmit($event)">
+  <div class="modal-header">
+    <h2 class="modal-title h5" id="reauth-title">Tu sesión expiró</h2>
+  </div>
+  <div class="modal-body">
+    <p>
+      Por seguridad, vuelve a ingresar la contraseña de
+      <strong>{{ email }}</strong> para continuar donde estabas.
+    </p>
+    @if (serverError()) {
+      <div class="alert alert-danger py-2" role="alert">{{ serverError() }}</div>
+    }
+    <app-password-input [field]="reauthForm.password" autocomplete="current-password" />
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="cancel()">Cerrar sesión</button>
+    <button type="submit" class="btn btn-primary" [disabled]="reauthForm().submitting()">
+      @if (reauthForm().submitting()) {
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+      }
+      Continuar
+    </button>
+  </div>
+</form>

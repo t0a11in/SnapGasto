@@ -1,0 +1,98 @@
+.pie-layout {
+  display: grid;
+  grid-template-columns: minmax(10rem, 15rem) 1fr;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.pie-plot {
+  position: relative;
+}
+
+.pie {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* 2px de superficie entre sectores. */
+.slice {
+  stroke: var(--bs-body-bg);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.slice.is-dim {
+  opacity: 0.45;
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.legend-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  border: 0;
+  border-radius: 0.375rem;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+
+  &:hover,
+  &.is-active,
+  &:focus-visible {
+    background: var(--bs-tertiary-bg);
+    outline: 0;
+  }
+}
+
+.swatch {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.legend-value {
+  min-width: 6.5rem;
+  text-align: right;
+}
+
+.chart-tooltip {
+  position: absolute;
+  z-index: 5;
+  transform: translate(12px, calc(-100% - 8px));
+  padding: 0.45rem 0.65rem;
+  border-radius: 0.5rem;
+  background: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+  font-size: 0.8rem;
+  line-height: 1.35;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+@media (max-width: 767.98px) {
+  .pie-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .pie-plot {
+    max-width: 14rem;
+    margin: 0 auto;
+  }
+}

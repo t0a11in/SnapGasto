@@ -1,0 +1,59 @@
+<form novalidate (submit)="onSubmit($event)">
+  <div class="modal-header">
+    <h2 class="modal-title h5" id="admin-expense-modal-title">{{ editingId() ? 'Editar gasto' : 'Nuevo gasto' }}</h2>
+    <button type="button" class="btn-close" aria-label="Cerrar" (click)="activeModal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    @if (serverError()) {
+      <div class="alert alert-danger py-2" role="alert">{{ serverError() }}</div>
+    }
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label" for="ae-user">Usuario</label>
+        <select id="ae-user" class="form-select"
+          [class.is-invalid]="expenseForm.userId().touched() && expenseForm.userId().invalid()"
+          [formField]="expenseForm.userId">
+          <option value="" disabled>Selecciona…</option>
+          @for (u of users(); track u.id) { <option [value]="u.id">{{ u.fullName }} ({{ u.email }})</option> }
+        </select>
+        <app-field-errors [field]="expenseForm.userId" />
+      </div>
+      <div class="col-sm-6">
+        <label class="form-label" for="ae-amount">Monto</label>
+        <input id="ae-amount" type="number" inputmode="decimal" step="any" class="form-control"
+          [class.is-invalid]="expenseForm.amount().touched() && expenseForm.amount().invalid()"
+          [formField]="expenseForm.amount" />
+        <app-field-errors [field]="expenseForm.amount" />
+        @if (model().amount) {
+          <div class="form-text">{{ model().amount | money }}</div>
+        }
+      </div>
+      <div class="col-sm-6">
+        <label class="form-label" for="ae-date">Fecha</label>
+        <input id="ae-date" type="date" class="form-control"
+          [class.is-invalid]="expenseForm.date().touched() && expenseForm.date().invalid()"
+          [formField]="expenseForm.date" />
+        <app-field-errors [field]="expenseForm.date" />
+      </div>
+      <div class="col-sm-6">
+        <app-category-autocomplete [field]="expenseForm.category" [options]="categoryOptions()" />
+      </div>
+      <div class="col-sm-6">
+        <label class="form-label" for="ae-payment">Medio de pago</label>
+        <select id="ae-payment" class="form-select" [formField]="expenseForm.paymentMethod">
+          @for (pm of paymentMethods; track pm.value) { <option [value]="pm.value">{{ pm.label }}</option> }
+        </select>
+      </div>
+      <div class="col-12">
+        <label class="form-label" for="ae-description">Descripción <span class="text-body-secondary">(opcional)</span></label>
+        <textarea id="ae-description" rows="2" class="form-control"
+          [formField]="expenseForm.description"></textarea>
+        <app-field-errors [field]="expenseForm.description" />
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">Cancelar</button>
+    <button type="submit" class="btn btn-primary" [disabled]="expenseForm().submitting()">Guardar</button>
+  </div>
+</form>

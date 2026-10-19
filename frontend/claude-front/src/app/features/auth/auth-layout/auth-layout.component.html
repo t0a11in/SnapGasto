@@ -1,0 +1,15 @@
+<main class="auth-page d-flex align-items-center justify-content-center px-3 py-5">
+  <section class="card auth-card shadow-sm w-100" [attr.aria-labelledby]="'auth-title'">
+    <div class="card-body p-4 p-sm-5">
+      <div class="d-flex align-items-center gap-2 mb-4 text-primary">
+        <app-icon name="camera" [size]="26" />
+        <span class="fs-4 fw-bold brand">SnapGasto</span>
+      </div>
+      <h1 class="h4 mb-1" id="auth-title">{{ title() }}</h1>
+      @if (subtitle()) {
+        <p class="text-body-secondary mb-4">{{ subtitle() }}</p>
+      }
+      <ng-content />
+    </div>
+  </section>
+</main>

@@ -1,0 +1,78 @@
+<form novalidate (submit)="onSubmit($event)">
+  <div class="modal-header">
+    <h2 class="modal-title h5" id="expense-modal-title">{{ editingId() ? 'Editar gasto' : 'Nuevo gasto' }}</h2>
+    <button type="button" class="btn-close" aria-label="Cerrar" (click)="activeModal.dismiss()"></button>
+  </div>
+
+  <div class="modal-body">
+    @if (serverError()) {
+      <div class="alert alert-danger py-2" role="alert">{{ serverError() }}</div>
+    }
+
+    <div class="row g-3">
+      <div class="col-sm-6">
+        <label class="form-label" for="expense-amount">Monto</label>
+        <input
+          id="expense-amount"
+          type="number"
+          inputmode="decimal"
+          step="any"
+          class="form-control"
+          [class.is-invalid]="expenseForm.amount().touched() && expenseForm.amount().invalid()"
+          [formField]="expenseForm.amount"
+        />
+        <app-field-errors [field]="expenseForm.amount" />
+        @if (model().amount) {
+          <div class="form-text">{{ model().amount | money }}</div>
+        }
+      </div>
+
+      <div class="col-sm-6">
+        <label class="form-label" for="expense-date">Fecha</label>
+        <input
+          id="expense-date"
+          type="date"
+          class="form-control"
+          [class.is-invalid]="expenseForm.date().touched() && expenseForm.date().invalid()"
+          [formField]="expenseForm.date"
+        />
+        <app-field-errors [field]="expenseForm.date" />
+      </div>
+
+      <div class="col-sm-6">
+        <app-category-autocomplete [field]="expenseForm.category" [options]="categoryOptions()" />
+      </div>
+
+      <div class="col-sm-6">
+        <label class="form-label" for="expense-payment">Medio de pago</label>
+        <select id="expense-payment" class="form-select" [formField]="expenseForm.paymentMethod">
+          @for (pm of paymentMethods; track pm.value) {
+            <option [value]="pm.value">{{ pm.label }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label" for="expense-description">Descripción <span class="text-body-secondary">(opcional)</span></label>
+        <textarea
+          id="expense-description"
+          rows="2"
+          class="form-control"
+          [class.is-invalid]="expenseForm.description().touched() && expenseForm.description().invalid()"
+          [formField]="expenseForm.description"
+        ></textarea>
+        <app-field-errors [field]="expenseForm.description" />
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">Cancelar</button>
+    <button type="submit" class="btn btn-primary" [disabled]="expenseForm().submitting()">
+      @if (expenseForm().submitting()) {
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+      }
+      Guardar
+    </button>
+  </div>
+</form>

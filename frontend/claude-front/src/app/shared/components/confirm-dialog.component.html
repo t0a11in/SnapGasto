@@ -1,0 +1,17 @@
+<div class="modal-header">
+  <h2 class="modal-title h5" id="confirm-title">{{ options().title }}</h2>
+  <button type="button" class="btn-close" aria-label="Cerrar" (click)="modal.dismiss()"></button>
+</div>
+<div class="modal-body"><p class="mb-0">{{ options().message }}</p></div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+  <button
+    type="button"
+    class="btn"
+    [class.btn-danger]="options().danger !== false"
+    [class.btn-primary]="options().danger === false"
+    (click)="modal.close(true)"
+  >
+    {{ options().confirmText ?? 'Confirmar' }}
+  </button>
+</div>

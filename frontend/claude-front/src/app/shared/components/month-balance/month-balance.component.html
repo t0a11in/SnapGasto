@@ -1,0 +1,40 @@
+<section class="card stat-card balance" [class.is-negative]="ready() && !positive()" aria-label="Balance del mes">
+  <div class="card-body">
+    <div class="row g-3 align-items-center">
+      <div class="col-6 col-md-3">
+        <div class="text-body-secondary small d-flex align-items-center gap-1">
+          <app-icon name="trending-up" [size]="14" /> Ingresos
+        </div>
+        <div class="fs-5 fw-semibold">{{ income() === null ? '—' : (income() | money) }}</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="text-body-secondary small d-flex align-items-center gap-1">
+          <app-icon name="trending-down" [size]="14" /> Gastos
+        </div>
+        <div class="fs-5 fw-semibold">{{ expense() === null ? '—' : (expense() | money) }}</div>
+      </div>
+      <div class="col-md-6">
+        <div class="d-flex justify-content-between align-items-baseline">
+          <span class="text-body-secondary small">Diferencia del mes</span>
+          @if (ready()) {
+            <span class="small text-body-secondary">Gastado {{ spentRatio() | percent1 }} de los ingresos</span>
+          }
+        </div>
+        @if (ready()) {
+          <div class="fs-3 fw-bold" [class.text-success]="positive()" [class.text-danger]="!positive()">
+            {{ positive() ? '+' : '' }}{{ balance() | money }}
+          </div>
+          <div class="progress balance-progress" role="progressbar" aria-label="Proporción de ingresos gastada"
+            [attr.aria-valuenow]="barWidth()" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar" [class.bg-danger]="!positive()" [style.width.%]="barWidth()"></div>
+          </div>
+          <div class="small mt-1" [class.text-success]="positive()" [class.text-danger]="!positive()">
+            {{ positive() ? 'Te quedan ' + (absBalance() | money) + ' este mes.' : 'Gastaste ' + (absBalance() | money) + ' más de lo que ingresaste.' }}
+          </div>
+        } @else {
+          <div class="placeholder-glow"><span class="placeholder col-6 placeholder-lg"></span></div>
+        }
+      </div>
+    </div>
+  </div>
+</section>

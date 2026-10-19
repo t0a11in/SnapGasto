@@ -1,0 +1,44 @@
+<form novalidate (submit)="onSubmit($event)">
+  <div class="modal-header">
+    <h2 class="modal-title h5" id="notification-modal-title">{{ editingId() ? 'Editar notificación' : 'Nueva notificación' }}</h2>
+    <button type="button" class="btn-close" aria-label="Cerrar" (click)="activeModal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    @if (serverError()) {
+      <div class="alert alert-danger py-2" role="alert">{{ serverError() }}</div>
+    }
+    <div class="mb-3">
+      <label class="form-label" for="n-user">Destinatario</label>
+      <select id="n-user" class="form-select"
+        [class.is-invalid]="notificationForm.userId().touched() && notificationForm.userId().invalid()"
+        [formField]="notificationForm.userId">
+        <option value="" disabled>Selecciona…</option>
+        @for (u of users(); track u.id) { <option [value]="u.id">{{ u.fullName }} ({{ u.email }})</option> }
+      </select>
+      <app-field-errors [field]="notificationForm.userId" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="n-title">Título</label>
+      <input id="n-title" type="text" class="form-control"
+        [class.is-invalid]="notificationForm.title().touched() && notificationForm.title().invalid()"
+        [formField]="notificationForm.title" />
+      <app-field-errors [field]="notificationForm.title" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="n-body">Mensaje</label>
+      <textarea id="n-body" rows="4" class="form-control"
+        [class.is-invalid]="notificationForm.body().touched() && notificationForm.body().invalid()"
+        [formField]="notificationForm.body"></textarea>
+      <div class="form-text text-end">{{ model().body.length }}/1000</div>
+      <app-field-errors [field]="notificationForm.body" />
+    </div>
+    <div class="form-check">
+      <input id="n-read" type="checkbox" class="form-check-input" [formField]="notificationForm.read" />
+      <label class="form-check-label" for="n-read">Marcar como leída</label>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">Cancelar</button>
+    <button type="submit" class="btn btn-primary" [disabled]="notificationForm().submitting()">Guardar</button>
+  </div>
+</form>

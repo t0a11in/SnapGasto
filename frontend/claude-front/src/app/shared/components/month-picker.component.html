@@ -1,0 +1,15 @@
+<div class="input-group month-picker" role="group" aria-label="Seleccionar mes">
+  <button type="button" class="btn btn-outline-secondary" (click)="shift(-1)" aria-label="Mes anterior">
+    <app-icon name="chevron-left" />
+  </button>
+  <input
+    type="month"
+    class="form-control text-center"
+    aria-label="Mes"
+    [value]="month()"
+    (change)="onInput($event)"
+  />
+  <button type="button" class="btn btn-outline-secondary" (click)="shift(1)" aria-label="Mes siguiente">
+    <app-icon name="chevron-right" />
+  </button>
+</div>

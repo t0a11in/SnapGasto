@@ -1,0 +1,59 @@
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1">Gastos</h1>
+    <p class="text-body-secondary mb-0">En qué se fue el dinero este mes.</p>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <app-month-picker [month]="store.month()" (monthChange)="store.setMonth($event)" />
+    <button type="button" class="btn btn-primary d-flex align-items-center gap-1" (click)="openForm()">
+      <app-icon name="plus" /> Nuevo gasto
+    </button>
+  </div>
+</div>
+
+<app-month-balance class="d-block mb-3" [income]="store.incomeTotal()" [expense]="store.loading() ? null : store.total()" />
+
+<section class="row g-3 mb-4" aria-label="Resumen del mes">
+  <div class="col-md-4">
+    <app-expense-summary-card
+      [total]="store.total()"
+      [count]="store.items().length"
+      [categories]="store.byCategory().length"
+    />
+  </div>
+  <div class="col-md-8">
+    <app-category-breakdown
+      [rows]="store.byCategory()"
+      [colors]="store.categoryColors()"
+      [visibleRows]="3"
+      (selectCategory)="openCategory($event)"
+      (expand)="openAllCategories()"
+    />
+  </div>
+</section>
+
+@if (store.error()) {
+  <div class="alert alert-danger d-flex justify-content-between align-items-center" role="alert">
+    <span>{{ store.error() }}</span>
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="store.load()">Reintentar</button>
+  </div>
+}
+
+<div class="card mb-4">
+  <app-expenses-table
+    [items]="store.sortedItems()"
+    [loading]="store.loading()"
+    [caption]="'Gastos del mes ' + store.month()"
+    (edit)="openForm($event)"
+    (remove)="remove($event)"
+  />
+</div>
+
+<app-expense-distribution-chart
+  [rows]="store.chartRows()"
+  [colors]="store.categoryColors()"
+  [total]="store.total()"
+  [month]="store.month()"
+  (selectCategory)="openCategory($event)"
+  (showAll)="openAllCategories()"
+/>

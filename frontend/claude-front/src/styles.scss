@@ -1,0 +1,67 @@
+/* Bootstrap CSS se carga antes desde angular.json. */
+:root {
+  --sg-page-bg: #f5f7fb;
+  --sg-auth-bg: radial-gradient(circle at 20% 10%, #e0ecff 0, transparent 45%),
+    radial-gradient(circle at 85% 90%, #e7fbef 0, transparent 40%), #f5f7fb;
+  --bs-primary: #2563eb;
+  --bs-primary-rgb: 37, 99, 235;
+  --bs-link-color: #2563eb;
+  --bs-link-color-rgb: 37, 99, 235;
+  /* Gráficos: un solo tono para magnitud; gris para "Otras". */
+  --sg-chart-bar: #2563eb;
+  --sg-chart-bar-hover: #1d4ed8;
+  --sg-chart-bar-muted: #7c8aa0;
+}
+
+/* SweetAlert2 por encima de la barra superior y de los modales. */
+.swal2-container {
+  z-index: 2000;
+}
+
+body {
+  background: var(--sg-page-bg);
+}
+
+.btn-primary {
+  --bs-btn-bg: #2563eb;
+  --bs-btn-border-color: #2563eb;
+  --bs-btn-hover-bg: #1d4ed8;
+  --bs-btn-hover-border-color: #1d4ed8;
+  --bs-btn-active-bg: #1e40af;
+  --bs-btn-disabled-bg: #2563eb;
+  --bs-btn-disabled-border-color: #2563eb;
+}
+
+.card {
+  border-color: rgba(15, 23, 42, 0.08);
+  border-radius: 0.875rem;
+}
+
+.card > .table-responsive {
+  border-radius: 0.875rem;
+}
+
+.stat-card {
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.cat-dot {
+  display: inline-block;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+}
+
+.cat-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 0.45rem;
+  color: #fff;
+}
+
+.app-icon svg {
+  display: block;
+}

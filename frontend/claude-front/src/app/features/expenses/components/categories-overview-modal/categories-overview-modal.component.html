@@ -1,0 +1,21 @@
+<div class="modal-header">
+  <div>
+    <h2 class="modal-title h5 mb-0" id="categories-overview-title">Gastos por categoría</h2>
+    <div class="small text-body-secondary">
+      {{ month() }} · {{ rows().length }} categoría(s) · Total <strong class="text-body">{{ total() | money }}</strong>
+    </div>
+  </div>
+  <button type="button" class="btn-close" aria-label="Cerrar" (click)="activeModal.dismiss()"></button>
+</div>
+<div class="modal-body">
+  <app-category-breakdown
+    [rows]="rows()"
+    [colors]="colors()"
+    [visibleRows]="null"
+    [showHeader]="false"
+    (selectCategory)="activeModal.close($event)"
+  />
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">Cerrar</button>
+</div>

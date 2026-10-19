@@ -1,0 +1,36 @@
+<app-auth-layout title="Inicia sesión" subtitle="Controla tus ingresos y gastos del mes.">
+  <form novalidate (submit)="onSubmit($event)">
+    <div class="mb-3">
+      <label class="form-label" for="login-email">Correo electrónico</label>
+      <input
+        id="login-email"
+        type="email"
+        class="form-control"
+        autocomplete="email"
+        [class.is-invalid]="loginForm.email().touched() && loginForm.email().invalid()"
+        [formField]="loginForm.email"
+      />
+      <app-field-errors [field]="loginForm.email" />
+    </div>
+
+    <div class="mb-3">
+      <app-password-input [field]="loginForm.password" autocomplete="current-password" />
+    </div>
+
+    <div class="form-check mb-4">
+      <input id="login-remember" type="checkbox" class="form-check-input" [formField]="loginForm.rememberEmail" />
+      <label class="form-check-label" for="login-remember">Recordar mi correo</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100" [disabled]="loginForm().submitting()">
+      @if (loginForm().submitting()) {
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+      }
+      Ingresar
+    </button>
+  </form>
+
+  <p class="text-center mt-4 mb-0">
+    ¿No tienes cuenta? <a routerLink="/register">Regístrate</a>
+  </p>
+</app-auth-layout>

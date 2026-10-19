@@ -1,0 +1,12 @@
+.balance {
+  border-left: 4px solid var(--bs-success);
+}
+
+.balance.is-negative {
+  border-left-color: var(--bs-danger);
+}
+
+.balance-progress {
+  height: 6px;
+  margin-top: 0.35rem;
+}

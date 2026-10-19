@@ -1,0 +1,33 @@
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1">Ingresos</h1>
+    <p class="text-body-secondary mb-0">Lo que entró este mes.</p>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <app-month-picker [month]="store.month()" (monthChange)="store.setMonth($event)" />
+    <button type="button" class="btn btn-primary d-flex align-items-center gap-1" (click)="openForm()">
+      <app-icon name="plus" /> Nuevo ingreso
+    </button>
+  </div>
+</div>
+
+<app-month-balance class="d-block mb-3" [income]="store.loading() ? null : store.incomeTotal()" [expense]="store.expenseTotal()" />
+
+<app-income-summary-cards class="d-block mb-4" [summary]="store.summary()" />
+
+@if (store.error()) {
+  <div class="alert alert-danger d-flex justify-content-between align-items-center" role="alert">
+    <span>{{ store.error() }}</span>
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="store.load()">Reintentar</button>
+  </div>
+}
+
+<div class="card">
+  <app-incomes-table
+    [items]="store.sortedItems()"
+    [loading]="store.loading()"
+    [caption]="'Ingresos del mes ' + store.month()"
+    (edit)="openForm($event)"
+    (remove)="remove($event)"
+  />
+</div>

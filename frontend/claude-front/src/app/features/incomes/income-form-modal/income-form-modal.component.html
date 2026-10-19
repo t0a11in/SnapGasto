@@ -1,0 +1,74 @@
+<form novalidate (submit)="onSubmit($event)">
+  <div class="modal-header">
+    <h2 class="modal-title h5" id="income-modal-title">{{ editingId() ? 'Editar ingreso' : 'Nuevo ingreso' }}</h2>
+    <button type="button" class="btn-close" aria-label="Cerrar" (click)="activeModal.dismiss()"></button>
+  </div>
+
+  <div class="modal-body">
+    @if (serverError()) {
+      <div class="alert alert-danger py-2" role="alert">{{ serverError() }}</div>
+    }
+
+    <div class="row g-3">
+      <div class="col-sm-6">
+        <label class="form-label" for="income-amount">Monto</label>
+        <input
+          id="income-amount"
+          type="number"
+          inputmode="decimal"
+          step="any"
+          class="form-control"
+          [class.is-invalid]="incomeForm.amount().touched() && incomeForm.amount().invalid()"
+          [formField]="incomeForm.amount"
+        />
+        <app-field-errors [field]="incomeForm.amount" />
+        @if (model().amount) {
+          <div class="form-text">{{ model().amount | money }}</div>
+        }
+      </div>
+
+      <div class="col-sm-6">
+        <label class="form-label" for="income-date">Fecha</label>
+        <input
+          id="income-date"
+          type="date"
+          class="form-control"
+          [class.is-invalid]="incomeForm.date().touched() && incomeForm.date().invalid()"
+          [formField]="incomeForm.date"
+        />
+        <app-field-errors [field]="incomeForm.date" />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label" for="income-type">Tipo</label>
+        <select id="income-type" class="form-select" [formField]="incomeForm.type">
+          @for (t of types; track t.value) {
+            <option [value]="t.value">{{ t.label }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label" for="income-description">Descripción <span class="text-body-secondary">(opcional)</span></label>
+        <textarea
+          id="income-description"
+          rows="2"
+          class="form-control"
+          [class.is-invalid]="incomeForm.description().touched() && incomeForm.description().invalid()"
+          [formField]="incomeForm.description"
+        ></textarea>
+        <app-field-errors [field]="incomeForm.description" />
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">Cancelar</button>
+    <button type="submit" class="btn btn-primary" [disabled]="incomeForm().submitting()">
+      @if (incomeForm().submitting()) {
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+      }
+      Guardar
+    </button>
+  </div>
+</form>

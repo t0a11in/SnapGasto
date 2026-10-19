@@ -1,0 +1,26 @@
+<label class="form-label d-flex justify-content-between align-items-center" [for]="inputId">
+  <span>{{ label() }}</span>
+  @if (isNew()) {
+    <span class="badge rounded-pill text-bg-info-subtle text-info-emphasis new-badge">Nueva</span>
+  }
+</label>
+<input
+  type="text"
+  class="form-control"
+  autocomplete="off"
+  [id]="inputId"
+  [attr.list]="listId"
+  [placeholder]="placeholder()"
+  [class.is-invalid]="invalid()"
+  [attr.aria-describedby]="invalid() ? errorId : null"
+  [formField]="field()"
+/>
+<datalist [id]="listId">
+  @for (option of options(); track option) {
+    <option [value]="option"></option>
+  }
+</datalist>
+<app-field-errors [field]="field()" [errorId]="errorId" />
+@if (isNew() && !invalid()) {
+  <div class="form-text">"{{ value() }}" no existe todavía: se guardará como categoría nueva.</div>
+}

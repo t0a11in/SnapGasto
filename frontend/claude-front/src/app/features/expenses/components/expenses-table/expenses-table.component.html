@@ -1,0 +1,58 @@
+<div class="table-responsive">
+  <table class="table table-hover align-middle mb-0">
+    <caption class="visually-hidden">{{ caption() }}</caption>
+    <thead class="table-light">
+      <tr>
+        <th scope="col">Fecha</th>
+        @if (showCategory()) {
+          <th scope="col">Categoría</th>
+        }
+        <th scope="col">Descripción</th>
+        <th scope="col">Medio de pago</th>
+        <th scope="col" class="text-end">Monto</th>
+        @if (showActions()) {
+          <th scope="col" class="text-end"><span class="visually-hidden">Acciones</span></th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @if (loading()) {
+        <tr>
+          <td [attr.colspan]="columns()" class="text-center py-4">
+            <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Cargando…
+          </td>
+        </tr>
+      } @else {
+        @for (expense of items(); track expense.id) {
+          <tr>
+            <td class="text-nowrap">{{ expense.date | date: 'dd-MM-yyyy' }}</td>
+            @if (showCategory()) {
+              <td>{{ expense.category }}</td>
+            }
+            <td>{{ expense.description || '—' }}</td>
+            <td><span class="badge text-bg-light border">{{ paymentLabel(expense.paymentMethod) }}</span></td>
+            <td class="text-end fw-semibold text-danger text-nowrap">{{ expense.amount | money }}</td>
+            @if (showActions()) {
+              <td class="text-end text-nowrap">
+                <button type="button" class="btn btn-sm btn-link text-body" (click)="edit.emit(expense)"
+                  [attr.aria-label]="'Editar gasto del ' + expense.date">
+                  <app-icon name="edit-2" [size]="16" />
+                </button>
+                <button type="button" class="btn btn-sm btn-link text-danger" (click)="remove.emit(expense)"
+                  [attr.aria-label]="'Eliminar gasto del ' + expense.date">
+                  <app-icon name="trash-2" [size]="16" />
+                </button>
+              </td>
+            }
+          </tr>
+        } @empty {
+          <tr>
+            <td [attr.colspan]="columns()" class="text-center text-body-secondary py-5">
+              No hay gastos registrados en este mes.
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>

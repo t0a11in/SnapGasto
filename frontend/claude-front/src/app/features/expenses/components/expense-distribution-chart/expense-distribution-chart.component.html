@@ -1,0 +1,74 @@
+<section class="card stat-card" aria-labelledby="distribution-title">
+  <div class="card-body">
+    <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-3">
+      <h2 class="h6 mb-0" id="distribution-title">Distribución de gastos por categoría</h2>
+      <span class="small text-body-secondary">Total {{ month() }}: <strong class="text-body">{{ total() | money }}</strong></span>
+    </div>
+
+    @if (slices().length) {
+      <div class="pie-layout">
+        <div class="pie-plot" #plot (mouseleave)="clear()">
+          <svg viewBox="0 0 200 200" class="pie" role="img"
+            [attr.aria-label]="'Gráfico de torta con ' + slices().length + ' categorías. El detalle está en la leyenda.'">
+            @for (slice of slices(); track slice.row.category) {
+              @if (slice.path) {
+                <path
+                  class="slice"
+                  [attr.d]="slice.path"
+                  [attr.fill]="slice.color"
+                  [attr.transform]="transform(slice)"
+                  [class.is-dim]="active() !== null && active() !== slice.row.category"
+                  (mousemove)="highlight(slice, $event)"
+                  (click)="open(slice)"
+                />
+              } @else {
+                <circle
+                  class="slice"
+                  cx="100" cy="100" r="92"
+                  [attr.fill]="slice.color"
+                  (mousemove)="highlight(slice, $event)"
+                  (click)="open(slice)"
+                />
+              }
+            }
+          </svg>
+
+          @if (tooltip(); as t) {
+            <div class="chart-tooltip" role="presentation" [style.left.px]="t.x" [style.top.px]="t.y">
+              <div class="d-flex align-items-center gap-2 fw-semibold">
+                <span class="swatch" [style.background]="t.slice.color"></span>{{ t.slice.row.category }}
+              </div>
+              <div>{{ t.slice.row.total | money }} · {{ t.slice.row.share | percent1 }}</div>
+              <div class="text-body-secondary">{{ t.slice.row.count | thousands }} gasto(s)</div>
+            </div>
+          }
+        </div>
+
+        <ul class="legend list-unstyled mb-0" aria-label="Leyenda del gráfico">
+          @for (slice of slices(); track slice.row.category) {
+            <li>
+              <button
+                type="button"
+                class="legend-item"
+                [class.is-active]="active() === slice.row.category"
+                (mouseenter)="active.set(slice.row.category)"
+                (mouseleave)="clear()"
+                (focus)="active.set(slice.row.category)"
+                (blur)="clear()"
+                (click)="open(slice)"
+                [attr.aria-label]="slice.row.category + ': ' + (slice.row.total | money) + ', ' + (slice.row.share | percent1)"
+              >
+                <span class="swatch" [style.background]="slice.color" aria-hidden="true"></span>
+                <span class="legend-name text-truncate">{{ slice.row.category }}</span>
+                <span class="legend-share text-body-secondary">{{ slice.row.share | percent1 }}</span>
+                <span class="legend-value fw-semibold">{{ slice.row.total | money }}</span>
+              </button>
+            </li>
+          }
+        </ul>
+      </div>
+    } @else {
+      <p class="text-body-secondary small mb-0">Aún no hay gastos para graficar en este mes.</p>
+    }
+  </div>
+</section>

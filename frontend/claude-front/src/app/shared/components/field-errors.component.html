@@ -1,0 +1,7 @@
+@if (visible()) {
+  <div class="invalid-feedback d-block" [id]="errorId()" role="alert">
+    @for (msg of messages(); track msg) {
+      <div>{{ msg }}</div>
+    }
+  </div>
+}
