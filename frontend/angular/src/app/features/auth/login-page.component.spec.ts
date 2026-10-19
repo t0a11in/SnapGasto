@@ -51,7 +51,7 @@ describe('1) Login COMPONENT', () => {
     form.credentials.set({ fullName: '', email: 'ana@example.com', password: 'secreto123', rememberPassword: false });
     form.submit();
     expect(authApi.login).toHaveBeenCalledWith({ email: 'ana@example.com', password: 'secreto123' });
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/admin/incomes');
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/incomes');
   });
 
   it('Disabled button only email', () => {

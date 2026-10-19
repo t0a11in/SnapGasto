@@ -48,6 +48,6 @@ export class LoginPageComponent {
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
     return returnUrl?.startsWith('/') && !returnUrl.startsWith('//')
       ? returnUrl
-      : '/admin/incomes';
+      : '/incomes';
   }
 }

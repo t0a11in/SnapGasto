@@ -1,15 +1,15 @@
 import { NavService } from './nav.service';
 
 describe('NavService', () => {
-  it('keeps Ingresos directly after Gastos in the administration menu', () => {
-    const menu = new NavService().MENUITEMS;
-    const expensesIndex = menu.findIndex((item) => item.path === '/admin/expenses');
+  it('shows the personal income and expense modules to a standard user', () => {
+    const menu = new NavService().menuFor(false);
+    const incomesIndex = menu.findIndex((item) => item.path === '/incomes');
 
-    expect(expensesIndex).toBeGreaterThanOrEqual(0);
-    expect(menu[expensesIndex + 1]).toEqual(
+    expect(incomesIndex).toBeGreaterThanOrEqual(0);
+    expect(menu[incomesIndex + 1]).toEqual(
       jasmine.objectContaining({
-        path: '/admin/incomes',
-        title: 'Ingresos',
+        path: '/expenses',
+        title: 'Gastos',
         type: 'link',
       }),
     );

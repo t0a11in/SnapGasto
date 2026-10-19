@@ -18,11 +18,14 @@ abstract final class AppStrings {
   static const movements = 'Movimientos';
   static const recentExpenses = 'Últimos gastos';
   static const addExpense = 'Agregar gasto';
+  static const editExpense = 'Editar gasto';
+  static const saveExpense = 'Guardar gasto';
   static const addIncome = 'Nuevo ingreso';
   static const editIncome = 'Editar ingreso';
   static const saveIncome = 'Guardar ingreso';
   static const saving = 'Guardando…';
   static const incomeRecords = 'Movimientos de ingresos';
+  static const expenseRecords = 'Movimientos de gastos';
   static const incomeSource = 'Origen';
   static const cardIncome = 'Tarjeta';
   static const cashIncome = 'Físico';
@@ -49,6 +52,17 @@ abstract final class AppStrings {
       'Usa el botón + para registrar dinero en tarjeta o efectivo.';
   static const descriptionOptional = 'Descripción (opcional)';
   static const retry = 'Reintentar';
+  static const close = 'Cerrar';
+  static const viewReceipt = 'Ver boleta';
+  static const localReceipt = 'Boleta local';
+  static const receiptUnavailable =
+      'La imagen ya no está disponible en este dispositivo.';
+  static const attachReceipt = 'Adjuntar boleta (opcional)';
+  static const receiptAttached = 'Boleta adjunta';
+  static const receiptLocalOnly = 'Se guardará solamente en este dispositivo.';
+  static const removeReceipt = 'Quitar boleta';
+  static const takePhoto = 'Tomar foto';
+  static const chooseFromDevice = 'Seleccionar del dispositivo';
   static const logout = 'Cerrar sesión';
   static const role = 'Rol';
   static const invalidEmail = 'Ingresa un correo válido.';

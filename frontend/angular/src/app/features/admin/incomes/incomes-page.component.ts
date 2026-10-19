@@ -1,8 +1,8 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
-import { Income, IncomeMonthlySummary, IncomePayload, IncomeType } from '../../core/models/income.models';
-import { IncomeApiService } from '../../core/services/income-api.service';
+import { IncomeApiService } from '../../../core/services/income-api.service';
+import { Income, IncomeMonthlySummary, IncomePayload, IncomeType } from '../../../core/models/income.models';
 
 function today(): string {
   const now = new Date();

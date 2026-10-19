@@ -1,5 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, computed, inject } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter } from 'rxjs';
 import { AuthApiService } from '../../../core/services/auth-api.service';
 import { SessionStore } from '../../../core/state/session.store';
 import { NavService } from '../../../shared/services/nav.service';
@@ -19,51 +21,23 @@ export class AdminShellComponent {
   private readonly router = inject(Router);
   private readonly navServices = inject(NavService);
   private readonly appStore = inject(AppStore);
-  protected menu: Menu[] | any;;
+  private readonly destroyRef = inject(DestroyRef);
+  protected readonly menu = computed(() => this.navServices.menuFor(this.sessionStore.isAdmin()));
+
   constructor() {
-    this.navServices.items.subscribe(menuItems => {
-      this.menu = menuItems
-      this.router.events.subscribe((event) => {
-        if (event instanceof NavigationEnd) {
-          menuItems.filter(items => {
-            if (items.path === event.url)
-              this.setNavActive(items)
-            if (!items.children) return false
-            items.children.filter(subItems => {
-              if (subItems.path === event.url)
-                this.setNavActive(subItems)
-              if (!subItems.children) return false
-              subItems.children.filter(subSubItems => {
-                if (subSubItems.path === event.url)
-                  this.setNavActive(subSubItems)
-              })
-              return
-            })
-            return
-          }
-          )
-        }
-      })
-    })
+    this.router.events
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((event) => this.setNavActive(event.urlAfterRedirects));
   }
-  setNavActive(item: any) {
-    console.log(`navActive ${JSON.stringify(item)}`)
-    this.appStore.start(item, 'snapgasto.admin.nav.app');
-    this.menu.filter((menuItem: any) => {
-      if (menuItem != item)
-        menuItem.active = false
-      if (menuItem.children && menuItem.children.includes(item))
-        menuItem.active = true
-      if (menuItem.children) {
-        menuItem.children.filter((submenuItems: any) => {
-          if (submenuItems.children && submenuItems.children.includes(item)) {
-            menuItem.active = true
-            submenuItems.active = true
-          }
-        })
-      }
-    })
+
+  private setNavActive(url: string): void {
+    const item = this.menu().find((menuItem) => menuItem.path === url);
+    if (item) this.appStore.start(item, 'snapgasto.admin.nav.app');
   }
+
   logout(): void {
     this.authApi.logout();
     void this.router.navigateByUrl('/login');

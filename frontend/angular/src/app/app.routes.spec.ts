@@ -1,17 +1,25 @@
 import { adminGuard } from './core/guards/admin.guard';
-import { ExpensesPageComponent } from './features/admin/expense/expense.page.component';
+import { authGuard } from './core/guards/auth.guard';
+import { ExpensesPageComponent as AdminExpensesPageComponent } from './features/admin/expense/expense.page.component';
+import { AdminShellComponent } from './features/admin/shell/admin-shell.component';
+import { ExpensesPageComponent } from './features/expenses/expenses-page.component';
 import { IncomesPageComponent } from './features/incomes/incomes-page.component';
 import { routes } from './app.routes';
 
 describe('application routes', () => {
-  it('renders incomes inside the administration shell immediately after expenses', () => {
-    const adminRoute = routes.find((route) => route.path === 'admin');
-    const children = adminRoute?.children ?? [];
-    const expenseIndex = children.findIndex((route) => route.component === ExpensesPageComponent);
+  it('renders personal incomes and expenses inside the authenticated shell', () => {
+    const shellRoute = routes.find((route) => route.path === '' && route.component === AdminShellComponent);
+    const children = shellRoute?.children ?? [];
 
-    expect(adminRoute?.canActivate).toContain(adminGuard);
-    expect(expenseIndex).toBeGreaterThanOrEqual(0);
-    expect(children[expenseIndex + 1]).toEqual(
+    expect(shellRoute?.canActivate).toContain(authGuard);
+    expect(children).toContain(
+      jasmine.objectContaining({
+        path: 'expenses',
+        component: ExpensesPageComponent,
+        title: 'Gastos | SnapGasto',
+      }),
+    );
+    expect(children).toContain(
       jasmine.objectContaining({
         path: 'incomes',
         component: IncomesPageComponent,
@@ -20,12 +28,25 @@ describe('application routes', () => {
     );
   });
 
-  it('redirects the application entry point to the shared incomes view', () => {
-    expect(routes.find((route) => route.path === '')).toEqual(
-      jasmine.objectContaining({ redirectTo: 'admin/incomes', pathMatch: 'full' }),
+  it('keeps the administration expense maintainer behind the admin guard', () => {
+    const shellRoute = routes.find((route) => route.path === '' && route.component === AdminShellComponent);
+    const adminRoute = shellRoute?.children?.find((route) => route.path === 'admin');
+
+    expect(adminRoute?.canActivate).toContain(adminGuard);
+    expect(adminRoute?.children).toContain(
+      jasmine.objectContaining({
+        path: 'expenses',
+        component: AdminExpensesPageComponent,
+        title: 'Gastos de usuarios | SnapGasto',
+      }),
     );
-    expect(routes.find((route) => route.path === '**')).toEqual(
-      jasmine.objectContaining({ redirectTo: 'admin/incomes' }),
+  });
+
+  it('redirects unknown authenticated paths to incomes', () => {
+    const shellRoute = routes.find((route) => route.path === '' && route.component === AdminShellComponent);
+
+    expect(shellRoute?.children).toContain(
+      jasmine.objectContaining({ path: '**', redirectTo: 'incomes' }),
     );
   });
 });

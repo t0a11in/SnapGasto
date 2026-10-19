@@ -1,10 +1,10 @@
 <div class="app-shell">
   <aside class="sidebar">
-    <a class="brand" routerLink="/admin/incomes"><span>◈</span> SnapGasto</a>
+    <a class="brand" routerLink="/incomes"><span>◈</span> SnapGasto</a>
     <p class="sidebar-caption">{{ sessionStore.isAdmin() ? 'ADMINISTRACIÓN' : 'MI DINERO' }}</p>
     <nav aria-label="Mantenedores">
 
-      @for (menuItem of menu; track $index) {
+      @for (menuItem of menu(); track menuItem.path) {
         @if(menuItem.type === 'link'){
         <a [routerLink]="menuItem.path" routerLinkActive="active" class="nav-item">
           @if(menuItem.icon){

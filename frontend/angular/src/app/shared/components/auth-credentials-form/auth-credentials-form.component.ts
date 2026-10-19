@@ -1,4 +1,4 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, input, model, output, signal } from '@angular/core';
 import { email, form, FormField, maxLength, minLength, required } from '@angular/forms/signals';
 
 export type AuthFormMode = 'login' | 'register';
@@ -33,6 +33,7 @@ export class AuthCredentialsFormComponent {
     password: '',
     rememberPassword: Boolean(this.rememberedEmail()),
   });
+  
   readonly credentialsForm = form(this.credentials, (schemaPath) => {
     maxLength(schemaPath.fullName, 120, { message: 'El nombre puede tener hasta 120 caracteres.' });
     required(schemaPath.fullName, {

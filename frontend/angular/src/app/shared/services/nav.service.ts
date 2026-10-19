@@ -26,13 +26,23 @@ export class NavService {
 		this.screenWidth = window.innerWidth;
 	}
 
-	MENUITEMS: Menu[] = [
+	readonly PERSONAL_MENU: Menu[] = [
+		{ path: '/incomes', title: 'Ingresos', icon: 'trending-up', type: 'link' },
+		{ path: '/expenses', title: 'Gastos', icon: 'trending-down', type: 'link' },
+	];
+
+	readonly ADMIN_MENU: Menu[] = [
 		{ path: '/admin/users', title: 'Usuarios', icon: 'users', type: 'link' },
-		{ path: '/admin/expenses', title: 'Gastos', icon: 'trending-down', type: 'link' },
-		{ path: '/admin/incomes', title: 'Ingresos', icon: 'trending-up', type: 'link' },
+		{ path: '/admin/expenses', title: 'Gastos de usuarios', icon: 'clipboard', type: 'link' },
 		{ path: '/admin/categories', title: 'Categorías', icon: 'grid', type: 'link' },
 		{ path: '/admin/notifications', title: 'Notificaciones', icon: 'bell', type: 'link' },
 	];
+
+	readonly MENUITEMS: Menu[] = [...this.PERSONAL_MENU, ...this.ADMIN_MENU];
+
+	menuFor(isAdmin: boolean): Menu[] {
+		return isAdmin ? this.MENUITEMS : this.PERSONAL_MENU;
+	}
 
 
 

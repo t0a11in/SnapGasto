@@ -15,35 +15,21 @@ class ExpenseController extends GetxController {
   final LocalReceiptStore _receiptStore;
   final expenses = <Expense>[].obs;
   final isLoading = false.obs;
+  final isSaving = false.obs;
   final errorMessage = ''.obs;
+  final selectedMonth = _firstDayOfMonth(DateTime.now()).obs;
 
-  double get monthlyTotal {
-    final today = DateTime.now();
-    return expenses
-        .where(
-          (expense) =>
-              expense.date.year == today.year &&
-              expense.date.month == today.month,
-        )
-        .fold(0, (total, expense) => total + expense.amount);
-  }
+  double get monthlyTotal =>
+      expenses.fold(0, (total, expense) => total + expense.amount);
 
-  int get monthlyMovements {
-    final today = DateTime.now();
-    return expenses
-        .where(
-          (expense) =>
-              expense.date.year == today.year &&
-              expense.date.month == today.month,
-        )
-        .length;
-  }
+  int get monthlyMovements => expenses.length;
 
-  Future<void> load() async {
+  Future<void> load({DateTime? month}) async {
+    if (month != null) selectedMonth.value = _firstDayOfMonth(month);
     isLoading.value = true;
     errorMessage.value = '';
     try {
-      final remoteExpenses = await _repository.list();
+      final remoteExpenses = await _repository.list(selectedMonth.value);
       expenses.assignAll(
         remoteExpenses.map(
           (expense) => expense.copyWith(
@@ -66,6 +52,8 @@ class ExpenseController extends GetxController {
     required String paymentMethod,
     XFile? receipt,
   }) async {
+    isSaving.value = true;
+    errorMessage.value = '';
     String? localReceiptPath;
     try {
       if (receipt != null) localReceiptPath = await _receiptStore.save(receipt);
@@ -79,12 +67,43 @@ class ExpenseController extends GetxController {
       if (localReceiptPath != null) {
         await _receiptStore.associate(expense.id, localReceiptPath);
       }
-      expenses.insert(0, expense.copyWith(receiptLocalPath: localReceiptPath));
+      await load();
       return true;
     } catch (error) {
       await _receiptStore.deleteUnassociated(localReceiptPath);
       errorMessage.value = _apiClient.errorMessage(error);
       return false;
+    } finally {
+      isSaving.value = false;
+    }
+  }
+
+  Future<bool> updateExpense({
+    required Expense expense,
+    required double amount,
+    required String category,
+    required DateTime date,
+    String? description,
+    required String paymentMethod,
+  }) async {
+    isSaving.value = true;
+    errorMessage.value = '';
+    try {
+      await _repository.update(
+        id: expense.id,
+        amount: amount,
+        category: category,
+        date: date,
+        description: description,
+        paymentMethod: paymentMethod,
+      );
+      await load();
+      return true;
+    } catch (error) {
+      errorMessage.value = _apiClient.errorMessage(error);
+      return false;
+    } finally {
+      isSaving.value = false;
     }
   }
 
@@ -92,9 +111,12 @@ class ExpenseController extends GetxController {
     try {
       await _repository.delete(id);
       await _receiptStore.deleteFor(id);
-      expenses.removeWhere((expense) => expense.id == id);
+      await load();
     } catch (error) {
       errorMessage.value = _apiClient.errorMessage(error);
     }
   }
+
+  static DateTime _firstDayOfMonth(DateTime value) =>
+      DateTime(value.year, value.month);
 }

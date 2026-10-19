@@ -69,4 +69,14 @@ describe('IncomesPageComponent', () => {
       description: '',
     });
   });
+
+  it('opens the create modal when the user clicks Nuevo ingreso', () => {
+    const fixture = TestBed.createComponent(IncomesPageComponent);
+    fixture.detectChanges();
+
+    (fixture.nativeElement.querySelector('.panel-actions .button-primary') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('[role="dialog"]')).not.toBeNull();
+  });
 });
