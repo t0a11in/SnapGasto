@@ -1,0 +1,36 @@
+name: claude_flutter
+description: "SnapGasto — control de ingresos y gastos (Flutter + BLoC)."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  # Estado
+  flutter_bloc: ^9.1.0
+  equatable: ^2.0.7
+  # HTTP (interceptores Bearer / 419 / errores)
+  dio: ^5.8.0
+  # Navegación con guards
+  go_router: ^16.0.0
+  # Sesión persistida
+  shared_preferences: ^2.5.0
+  # Gráfico de torta
+  fl_chart: ^1.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  bloc_test: ^10.0.0
+
+flutter:
+  uses-material-design: true
