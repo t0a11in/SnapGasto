@@ -26,6 +26,7 @@ import cl.snapgasto.backend.dto.ExpenseRequest;
 import cl.snapgasto.backend.dto.ExpenseResponse;
 import cl.snapgasto.backend.entity.AppUser;
 import cl.snapgasto.backend.entity.Expense;
+import cl.snapgasto.backend.entity.ExpenseGroup;
 import cl.snapgasto.backend.repository.ExpenseRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,12 +35,15 @@ class ExpenseServiceTest {
     @Mock
     private ExpenseRepository expenseRepository;
 
+    @Mock
+    private GroupAccessService groupAccessService;
+
     private ExpenseService expenseService;
     private AppUser user;
 
     @BeforeEach
     void setUp() {
-        expenseService = new ExpenseService(expenseRepository);
+        expenseService = new ExpenseService(expenseRepository, groupAccessService);
         user = new AppUser();
         user.setId(UUID.randomUUID());
         user.setEmail("person@example.com");
@@ -74,6 +78,29 @@ class ExpenseServiceTest {
     }
 
     @Test
+    void assignsTheExpenseToAGoupOnlyWhenTheAuthenticatedUserIsAMember() {
+        UUID groupId = UUID.randomUUID();
+        ExpenseGroup group = new ExpenseGroup();
+        group.setId(groupId);
+        ExpenseRequest request = new ExpenseRequest(
+                new BigDecimal("12490.50"),
+                "Alimentación",
+                LocalDate.of(2026, 10, 8),
+                null,
+                "Tarjeta",
+                groupId);
+        when(groupAccessService.requireMember(groupId, user)).thenReturn(group);
+        when(expenseRepository.save(any(Expense.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        expenseService.create(request, user);
+
+        ArgumentCaptor<Expense> captor = ArgumentCaptor.forClass(Expense.class);
+        verify(expenseRepository).save(captor.capture());
+        assertEquals(group, captor.getValue().getExpenseGroup());
+        verify(groupAccessService).requireMember(groupId, user);
+    }
+
+    @Test
     void listsOnlyTheExpensesReturnedForTheAuthenticatedUser() {
         Expense first = expense("Supermercado", LocalDate.of(2026, 10, 8));
         Expense second = expense("Transporte", LocalDate.of(2026, 10, 7));
@@ -85,6 +112,20 @@ class ExpenseServiceTest {
         assertEquals(List.of("Supermercado", "Transporte"),
                 response.stream().map(ExpenseResponse::description).toList());
         verify(expenseRepository).findAllByUserOrderByDateDescCreatedAtDesc(user);
+    }
+
+    @Test
+    void listsOnlyExpensesFromTheRequestedMonthForTheAuthenticatedUser() {
+        Expense octoberExpense = expense("Supermercado", LocalDate.of(2026, 10, 8));
+        when(expenseRepository.findAllByUserAndDateBetweenOrderByDateDescCreatedAtDesc(
+                user, LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 31)))
+                .thenReturn(List.of(octoberExpense));
+
+        List<ExpenseResponse> response = expenseService.listFor(user, "2026-10");
+
+        assertEquals(List.of("Supermercado"), response.stream().map(ExpenseResponse::description).toList());
+        verify(expenseRepository).findAllByUserAndDateBetweenOrderByDateDescCreatedAtDesc(
+                user, LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 31));
     }
 
     @Test
@@ -107,6 +148,25 @@ class ExpenseServiceTest {
                 () -> expenseService.delete(expenseId, user));
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+    }
+
+    @Test
+    void updatesOnlyAnExpenseBelongingToTheAuthenticatedUser() {
+        UUID expenseId = UUID.randomUUID();
+        Expense expense = expense("Café", LocalDate.of(2026, 10, 8));
+        ExpenseRequest request = new ExpenseRequest(
+                new BigDecimal("8500"), " Transporte ", LocalDate.of(2026, 10, 9), "  Metro  ", " EFECTIVO ");
+        when(expenseRepository.findByIdAndUser(expenseId, user)).thenReturn(Optional.of(expense));
+        when(expenseRepository.save(expense)).thenReturn(expense);
+
+        ExpenseResponse response = expenseService.update(expenseId, request, user);
+
+        assertEquals(new BigDecimal("8500"), response.amount());
+        assertEquals("Transporte", response.category());
+        assertEquals(LocalDate.of(2026, 10, 9), response.date());
+        assertEquals("Metro", response.description());
+        assertEquals("EFECTIVO", response.paymentMethod());
+        verify(expenseRepository).save(expense);
     }
 
     private Expense expense(String description, LocalDate date) {

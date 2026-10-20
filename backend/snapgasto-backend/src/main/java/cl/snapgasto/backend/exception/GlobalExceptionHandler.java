@@ -1,5 +1,6 @@
 package cl.snapgasto.backend.exception;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -27,6 +28,13 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.valueOf(exception.getStatusCode().value());
         String message = exception.getReason() == null ? "La solicitud no pudo procesarse." : exception.getReason();
         return ResponseEntity.status(status).body(new ApiError(message));
+    }
+
+    @ExceptionHandler(TooManyRequestsException.class)
+    ResponseEntity<ApiError> handleTooManyRequests(TooManyRequestsException exception) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header(HttpHeaders.RETRY_AFTER, Long.toString(exception.getRetryAfterSeconds()))
+                .body(new ApiError(exception.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)

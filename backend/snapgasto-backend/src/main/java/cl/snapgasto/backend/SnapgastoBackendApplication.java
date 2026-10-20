@@ -33,7 +33,7 @@ public class SnapgastoBackendApplication {
 				valueOrMissing(environment.getProperty("DB_USER")),
 				isConfigured(environment.getProperty("DB_PASSWORD")) ? "configurada" : "FALTA");
 		log.info("Configuración JWT_SECRET={}",
-				isConfigured(environment.getProperty("JWT_SECRET")) ? "configurada" : "FALTA o se usará el valor por defecto");
+				isConfigured(environment.getProperty("JWT_SECRET")) ? "configurada" : "FALTA (la API no arrancará)");
 	}
 
 	private static String valueOrMissing(String value) {

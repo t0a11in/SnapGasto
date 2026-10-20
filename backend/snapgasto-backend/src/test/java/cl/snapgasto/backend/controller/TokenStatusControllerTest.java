@@ -47,10 +47,26 @@ class TokenStatusControllerTest {
     void delegatesTokenRenewalToTheSessionService() {
         AppUser user = user();
         AuthResponse expected = new AuthResponse("renewed-access-token", UserResponse.from(user));
-        when(tokenRefreshService.refresh(user)).thenReturn(expected);
+        when(tokenRefreshService.refresh(user, "current-token")).thenReturn(expected);
 
-        assertEquals(expected, controller().refresh(user));
-        verify(tokenRefreshService).refresh(user);
+        assertEquals(expected, controller().refresh(user, "Bearer current-token"));
+        verify(tokenRefreshService).refresh(user, "current-token");
+    }
+
+    @Test
+    void logoutRevokesTheBearerToken() {
+        controller().logout(user(), "Bearer current-token");
+
+        verify(tokenRevocationService).revoke("current-token");
+    }
+
+    @Test
+    void logoutAllInvalidatesEverySessionOfTheUser() {
+        AppUser user = user();
+
+        controller().logoutAll(user, "Bearer current-token");
+
+        verify(tokenRevocationService).revokeAllSessions(user);
     }
 
     private TokenStatusController controller() {

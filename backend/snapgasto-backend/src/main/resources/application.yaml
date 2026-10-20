@@ -8,10 +8,10 @@ spring:
   flyway:
     enabled: ${FLYWAY_ENABLED:true}
     locations: classpath:db/migration
-    # Permite adoptar instalaciones previas creadas por JPA: conserva V1 y
-    # aplica desde V2 sin recrear las tablas existentes.
+    # La base local ya contiene el esquema equivalente a V1--V4, creado
+    # previamente por Hibernate. Flyway la adopta desde V4 y aplica V5.
     baseline-on-migrate: true
-    baseline-version: 1
+    baseline-version: 4
   jpa:
     hibernate:
       ddl-auto: update
@@ -34,7 +34,18 @@ app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:*,http://127.0.0.1:*}
   security:
-    enabled: false
     jwt:
-      secret: ${JWT_SECRET:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30s}
+      # Sin valor por defecto: la API no arranca si JWT_SECRET no está definido.
+      secret: ${JWT_SECRET}
       expiration-minutes: ${JWT_EXPIRATION_MINUTES:120}
+      # Duración máxima de una sesión aunque se renueve el token con /refresh.
+      max-session-hours: ${JWT_MAX_SESSION_HOURS:168}
+    login-attempts:
+      # Intentos fallidos por correo antes de bloquear temporalmente el login.
+      max-failures: ${LOGIN_MAX_FAILURES:5}
+      lock-minutes: ${LOGIN_LOCK_MINUTES:15}
+    rate-limit:
+      # Solicitudes por minuto y por IP a login, registro y acceso con Google.
+      auth-requests-per-minute: ${AUTH_RATE_LIMIT_PER_MINUTE:20}
+    # Limpieza diaria de tokens revocados que ya expiraron (03:15).
+    revoked-token-cleanup-cron: ${REVOKED_TOKEN_CLEANUP_CRON:0 15 3 * * *}

@@ -50,6 +50,11 @@ public class Expense {
     @JoinColumn(name = "user_id", nullable = false)
     private AppUser user;
 
+    /** Grupo al que se imputa el gasto. Nulo significa que sigue siendo personal. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id")
+    private ExpenseGroup expenseGroup;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

@@ -15,3 +15,5 @@ app:
   security:
     jwt:
       secret: test-only-jwt-secret-must-have-at-least-thirty-two-characters
+      expiration-minutes: 120
+      max-session-hours: 168

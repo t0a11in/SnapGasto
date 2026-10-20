@@ -1,6 +1,8 @@
 package cl.snapgasto.backend.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,34 +37,59 @@ class TokenExpirationEndpointIntegrationTest {
     @Autowired
     private JwtService jwtService;
 
+    private AppUser user;
     private String token;
 
     @BeforeEach
     void setUp() {
         revokedTokenRepository.deleteAll();
         userRepository.deleteAll();
-        AppUser user = new AppUser();
+        user = new AppUser();
         user.setFullName("Expiration Test");
         user.setEmail("token-expiration@example.com");
         user.setPassword("not-used-by-jwt-expiration");
         user.setRole(Role.USER);
-        userRepository.save(user);
-        token = jwtService.generateToken(user.getEmail());
+        user = userRepository.save(user);
+        token = jwtService.generateToken(user);
     }
 
     @Test
-    void expiresTheBearerTokenAndRejectsItAfterward() throws Exception {
-        mockMvc.perform(get("/api/auth/v1/expire-token").header("Authorization", "Bearer " + token))
+    void logoutRevokesTheBearerTokenAndRejectsItAfterward() throws Exception {
+        mockMvc.perform(post("/api/auth/v1/logout").header("Authorization", "Bearer " + token))
                 .andExpect(status().isNoContent());
 
         mockMvc.perform(get("/api/auth/v1/token-status").header("Authorization", "Bearer " + token))
                 .andExpect(status().isUnauthorized())
+                .andExpect(header().string("WWW-Authenticate", "Bearer"))
+                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"))
                 .andExpect(jsonPath("$.message").value("No autorizado."));
     }
 
     @Test
-    void requiresABearerTokenToExpireIt() throws Exception {
-        mockMvc.perform(get("/api/auth/v1/expire-token"))
+    void logoutAllInvalidatesEveryTokenOfTheUser() throws Exception {
+        String otherDeviceToken = jwtService.generateToken(user, java.time.Instant.now().minusSeconds(60));
+
+        mockMvc.perform(post("/api/auth/v1/logout-all").header("Authorization", "Bearer " + token))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/auth/v1/token-status").header("Authorization", "Bearer " + token))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/auth/v1/token-status").header("Authorization", "Bearer " + otherDeviceToken))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void keepsTheDeprecatedGetExpireTokenWorkingForOlderClients() throws Exception {
+        mockMvc.perform(get("/api/auth/v1/expire-token").header("Authorization", "Bearer " + token))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/auth/v1/token-status").header("Authorization", "Bearer " + token))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void requiresABearerTokenToLogOut() throws Exception {
+        mockMvc.perform(post("/api/auth/v1/logout"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("No autorizado."));
     }

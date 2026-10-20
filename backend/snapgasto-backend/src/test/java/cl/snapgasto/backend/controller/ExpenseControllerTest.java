@@ -48,6 +48,17 @@ class ExpenseControllerTest {
     }
 
     @Test
+    void delegatesTheSelectedMonthForTheVersionedList() {
+        List<ExpenseResponse> expected = List.of(response());
+        when(expenseService.listFor(user, "2026-10")).thenReturn(expected);
+
+        List<ExpenseResponse> result = controller.listV1("2026-10", user);
+
+        assertEquals(expected, result);
+        verify(expenseService).listFor(user, "2026-10");
+    }
+
+    @Test
     void delegatesAValidExpenseCreationRequest() {
         ExpenseRequest request = request();
         ExpenseResponse expected = response();
@@ -66,6 +77,19 @@ class ExpenseControllerTest {
         controller.delete(expenseId, user);
 
         verify(expenseService).delete(expenseId, user);
+    }
+
+    @Test
+    void delegatesVersionedExpenseUpdate() {
+        UUID expenseId = UUID.randomUUID();
+        ExpenseRequest request = request();
+        ExpenseResponse expected = response();
+        when(expenseService.update(expenseId, request, user)).thenReturn(expected);
+
+        ExpenseResponse result = controller.update(expenseId, request, user);
+
+        assertEquals(expected, result);
+        verify(expenseService).update(expenseId, request, user);
     }
 
     private ExpenseRequest request() {

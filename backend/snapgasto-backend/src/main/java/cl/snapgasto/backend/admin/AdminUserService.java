@@ -79,11 +79,21 @@ public class AdminUserService {
     }
 
     private void apply(AdminUserRequest request, AppUser user, boolean creating) {
+        String email = normalizeEmail(request.email());
+        boolean passwordChanged = request.password() != null && !request.password().isBlank();
+        boolean credentialsChanged = !creating
+                && (passwordChanged || user.getRole() != request.role() || !email.equals(user.getEmail()));
+
         user.setFullName(request.fullName().trim());
-        user.setEmail(normalizeEmail(request.email()));
+        user.setEmail(email);
         user.setRole(request.role());
-        if (creating || (request.password() != null && !request.password().isBlank())) {
+        if (creating || passwordChanged) {
             user.setPassword(passwordEncoder.encode(request.password()));
+        }
+        if (credentialsChanged) {
+            // Cambio de contraseña, rol o correo: se cierran todas sus sesiones
+            // para que ningún token emitido antes conserve los permisos previos.
+            user.invalidateSessions();
         }
     }
 

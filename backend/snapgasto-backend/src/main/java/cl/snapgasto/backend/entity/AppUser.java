@@ -51,8 +51,20 @@ public class AppUser implements UserDetails {
     @Column(nullable = false, length = 20)
     private Role role = Role.USER;
 
+    /**
+     * Versión de credenciales. Cada JWT lleva este número en el claim {@code sv};
+     * al incrementarlo se invalidan de una vez todas las sesiones emitidas.
+     */
+    @Column(name = "session_version", nullable = false)
+    private int sessionVersion = 0;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    /** Invalida todos los tokens emitidos hasta ahora para esta cuenta. */
+    public void invalidateSessions() {
+        sessionVersion++;
+    }
 
     @PrePersist
     void assignCreatedAt() {

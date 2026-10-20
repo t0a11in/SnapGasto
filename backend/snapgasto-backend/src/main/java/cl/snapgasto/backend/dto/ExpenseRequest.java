@@ -2,6 +2,7 @@ package cl.snapgasto.backend.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -15,5 +16,16 @@ public record ExpenseRequest(
         @NotBlank(message = "La categoría es obligatoria.") @Size(max = 80) String category,
         @NotNull(message = "La fecha es obligatoria.") @PastOrPresent(message = "La fecha no puede ser futura.") LocalDate date,
         @Size(max = 500, message = "La descripción es demasiado larga.") String description,
-        @NotBlank(message = "El método de pago es obligatorio.") @Size(max = 60) String paymentMethod) {
+        @NotBlank(message = "El método de pago es obligatorio.") @Size(max = 60) String paymentMethod,
+        UUID groupId) {
+
+    /** Conserva compatibilidad con clientes que aún crean gastos personales. */
+    public ExpenseRequest(
+            BigDecimal amount,
+            String category,
+            LocalDate date,
+            String description,
+            String paymentMethod) {
+        this(amount, category, date, description, paymentMethod, null);
+    }
 }

@@ -13,7 +13,20 @@ public record ExpenseResponse(
         String category,
         LocalDate date,
         String description,
-        String paymentMethod) {
+        String paymentMethod,
+        UUID groupId) {
+
+    /** Conserva compatibilidad de construcción para pruebas y clientes antiguos. */
+    public ExpenseResponse(
+            UUID id,
+            BigDecimal amount,
+            String category,
+            LocalDate date,
+            String description,
+            String paymentMethod) {
+        this(id, amount, category, date, description, paymentMethod, null);
+    }
+
     public static ExpenseResponse from(Expense expense) {
         return new ExpenseResponse(
                 expense.getId(),
@@ -21,6 +34,7 @@ public record ExpenseResponse(
                 expense.getCategory(),
                 expense.getDate(),
                 expense.getDescription(),
-                expense.getPaymentMethod());
+                expense.getPaymentMethod(),
+                expense.getExpenseGroup() == null ? null : expense.getExpenseGroup().getId());
     }
 }

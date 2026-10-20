@@ -17,16 +17,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import cl.snapgasto.backend.dto.AuthResponse;
 import cl.snapgasto.backend.dto.TokenStatusResponse;
 import cl.snapgasto.backend.entity.AppUser;
+import cl.snapgasto.backend.security.BearerTokens;
 import cl.snapgasto.backend.service.TokenRefreshService;
 import cl.snapgasto.backend.service.TokenRevocationService;
 import cl.snapgasto.backend.service.TokenStatusService;
 
 /**
- * Expone un health-check de sesión, no un circuit breaker de infraestructura.
+ * Comprobación, renovación y cierre de la sesión JWT.
  */
 @RestController
 @RequestMapping("/api/auth/v1")
-@Tag(name = "Sesión", description = "Validación y restauración de una sesión autenticada.")
+@Tag(name = "Sesión", description = "Validación, renovación y cierre de una sesión autenticada.")
 @SecurityRequirement(name = "bearerAuth")
 public class TokenStatusController {
 
@@ -45,8 +46,8 @@ public class TokenStatusController {
 
     /**
      * Responde HTTP 200 solamente cuando el bearer token sigue siendo válido.
-     * Un token ausente, inválido, expirado o asociado a un usuario eliminado
-     * es rechazado por la cadena de seguridad con HTTP 401.
+     * Un token ausente, inválido o revocado recibe 401; uno vencido recibe 401
+     * con {@code code = TOKEN_EXPIRED}.
      */
     @GetMapping("/token-status")
     @Operation(summary = "Comprueba si el token JWT de la sesión sigue vigente")
@@ -54,25 +55,56 @@ public class TokenStatusController {
         return tokenStatusService.check(user);
     }
 
+    /** Emite un token nuevo y revoca el usado en la solicitud. */
     @PostMapping("/refresh")
-    @Operation(summary = "Renueva el access token JWT de una sesión vigente")
-    public AuthResponse refresh(@AuthenticationPrincipal AppUser user) {
-        return tokenRefreshService.refresh(user);
+    @Operation(summary = "Renueva el access token JWT de una sesión vigente (el token anterior queda revocado)")
+    public AuthResponse refresh(
+            @AuthenticationPrincipal AppUser user,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        return tokenRefreshService.refresh(user, BearerTokens.extract(authorization));
+    }
+
+    /** Cierra la sesión actual revocando el bearer token recibido. */
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Cierra la sesión actual (revoca el bearer token recibido)")
+    public void logout(
+            @AuthenticationPrincipal AppUser user,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        tokenRevocationService.revoke(requireToken(user, authorization));
+    }
+
+    /** Cierra todas las sesiones del usuario en todos sus dispositivos. */
+    @PostMapping("/logout-all")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Cierra todas las sesiones del usuario en todos los dispositivos")
+    public void logoutAll(
+            @AuthenticationPrincipal AppUser user,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        requireToken(user, authorization);
+        tokenRevocationService.revokeAllSessions(user);
     }
 
     /**
-     * Usa GET por compatibilidad con el flujo solicitado. En una API pública se
-     * recomienda exponer esta operación como POST o DELETE.
+     * @deprecated Una operación que cambia estado no debe ser GET. Usar
+     * {@code POST /api/auth/v1/logout}. Se mantiene solo mientras los clientes
+     * migran.
      */
+    @Deprecated
     @GetMapping("/expire-token")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Invalida el bearer token recibido")
+    @Operation(summary = "Obsoleto: usar POST /api/auth/v1/logout", deprecated = true)
     public void expireToken(
             @AuthenticationPrincipal AppUser user,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-        if (user == null || authorization == null || !authorization.startsWith("Bearer ")) {
+        logout(user, authorization);
+    }
+
+    private String requireToken(AppUser user, String authorization) {
+        String token = BearerTokens.extract(authorization);
+        if (user == null || token == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No autorizado.");
         }
-        tokenRevocationService.revoke(authorization.substring(7));
+        return token;
     }
 }

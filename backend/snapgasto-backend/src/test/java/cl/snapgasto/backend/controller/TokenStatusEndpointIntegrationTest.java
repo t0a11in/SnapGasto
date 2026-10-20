@@ -42,7 +42,7 @@ class TokenStatusEndpointIntegrationTest {
         user.setPassword("not-used-by-jwt-check");
         user.setRole(Role.USER);
         userRepository.save(user);
-        token = jwtService.generateToken(user.getEmail());
+        token = jwtService.generateToken(user);
     }
 
     @Test

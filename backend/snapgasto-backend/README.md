@@ -68,23 +68,47 @@ Las modificaciones de esquema se agregan como archivos nuevos en
 `src/main/resources/db/migration`, siguiendo el formato
 `V2__descripcion.sql`. No se editan migraciones que ya se hayan aplicado.
 
-## Comprobación de sesión JWT
+## Sesión JWT
 
-El endpoint autenticado `GET /api/auth/v1/token-status` sirve como comprobación
-liviana de sesión para el frontend. Envía el header
-`Authorization: Bearer <token>` y, si el token sigue vigente, responde:
+Todos los endpoints protegidos reciben `Authorization: Bearer <token>`.
 
-```json
-{ "tokenAlive": true }
-```
+| Endpoint | Uso |
+| --- | --- |
+| `GET /api/auth/v1/token-status` | Comprueba la sesión: `200 {"tokenAlive": true}`. |
+| `POST /api/auth/v1/refresh` | Emite un token nuevo y **revoca el anterior**. Conserva el inicio de sesión original: no se puede extender más allá de `JWT_MAX_SESSION_HOURS` (168 h por defecto). |
+| `POST /api/auth/v1/logout` | Cierra la sesión actual (revoca el token). `204`. |
+| `POST /api/auth/v1/logout-all` | Cierra todas las sesiones del usuario en todos sus dispositivos. `204`. |
+| `GET /api/auth/v1/expire-token` | **Obsoleto**: usar `POST /api/auth/v1/logout`. |
 
-Los tokens ausentes, expirados, inválidos o asociados a un usuario eliminado
-reciben `401`. No es un circuit breaker de infraestructura: no reintenta ni
-oculta fallas de servicios externos; sólo valida la sesión actual.
+No es un circuit breaker de infraestructura: no reintenta ni oculta fallas de
+servicios externos; sólo valida la sesión actual.
 
-### Renovación de token
+### Errores de autenticación
 
-`POST /api/auth/v1/refresh` recibe el mismo header `Authorization: Bearer
-<token>` y emite un nuevo `accessToken` mientras el token recibido siga
-vigente. No acepta credenciales ni un token vencido: en ambos casos responde
-`401`.
+| Situación | Respuesta |
+| --- | --- |
+| Token vencido | `401` + `{"code":"TOKEN_EXPIRED","message":"..."}` + `WWW-Authenticate: Bearer error="invalid_token"` |
+| Token ausente, inválido, revocado, de un usuario eliminado o de sesiones cerradas | `401` + `{"code":"UNAUTHORIZED","message":"No autorizado."}` |
+| Sesión que superó la duración máxima (en `/refresh`) | `401` + `{"message":"La sesión superó su duración máxima..."}` |
+| Demasiados intentos de login con un correo (`LOGIN_MAX_FAILURES` en `LOGIN_LOCK_MINUTES`) | `429` + `Retry-After` |
+| Demasiadas solicitudes por IP a login/registro/Google (`AUTH_RATE_LIMIT_PER_MINUTE`) | `429` + `Retry-After` + `{"code":"TOO_MANY_REQUESTS",...}` |
+
+Antes el token vencido respondía `419`; los clientes deben distinguirlo ahora
+por `code = TOKEN_EXPIRED` dentro del `401`.
+
+Las sesiones de un usuario se invalidan automáticamente cuando un
+administrador le cambia la contraseña, el rol o el correo, y cuando una cuenta
+creada con contraseña se vincula por primera vez con Google (en ese caso
+también se reemplaza la contraseña local, para impedir que alguien que
+registró ese correo antes que su dueño conserve el acceso).
+
+### Roles
+
+El registro con contraseña siempre crea cuentas `USER`. `APP_BOOTSTRAP_ADMIN_EMAIL`
+promueve a `ADMIN` una cuenta que ya existe al iniciar la API, y también da
+`ADMIN` a quien entre con Google usando ese correo (verificado por Google).
+
+### Secretos
+
+`JWT_SECRET` es obligatorio y no tiene valor por defecto: sin él la API no
+arranca. `.env` está en `.gitignore`; nunca debe subirse al repositorio.
