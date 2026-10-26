@@ -2,7 +2,8 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "cli": {
-    "packageManager": "npm"
+    "packageManager": "npm",
+    "analytics": false
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -27,6 +28,26 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "icon-nodes.json",
+                "input": "node_modules/lucide-static",
+                "output": "icons/lucide"
+              },
+              {
+                "glob": "tabler-nodes-*.json",
+                "input": "node_modules/@tabler/icons",
+                "output": "icons/tabler"
+              },
+              {
+                "glob": "bootstrap-icons.svg",
+                "input": "node_modules/bootstrap-icons",
+                "output": "icons/bootstrap"
+              },
+              {
+                "glob": "bootstrap-icons.json",
+                "input": "node_modules/bootstrap-icons/font",
+                "output": "icons/bootstrap"
               }
             ],
             "styles": [
@@ -62,7 +83,10 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "define": {
+                "ngApiBaseUrl": "'/api'"
+              }
             },
             "development": {
               "optimization": false,

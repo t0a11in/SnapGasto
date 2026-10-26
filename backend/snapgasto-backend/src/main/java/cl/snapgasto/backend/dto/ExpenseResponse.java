@@ -6,7 +6,12 @@ import java.util.UUID;
 
 import cl.snapgasto.backend.entity.Expense;
 
-/** Expone un gasto sin filtrar datos de otras cuentas. */
+/**
+ * Expone un gasto sin filtrar datos de otras cuentas.
+ *
+ * @param projectId proyecto que originó el gasto (recurrente o compra concretada); nulo si es manual.
+ * @param generated true si lo registró automáticamente un gasto recurrente.
+ */
 public record ExpenseResponse(
         UUID id,
         BigDecimal amount,
@@ -14,7 +19,9 @@ public record ExpenseResponse(
         LocalDate date,
         String description,
         String paymentMethod,
-        UUID groupId) {
+        UUID groupId,
+        UUID projectId,
+        boolean generated) {
 
     /** Conserva compatibilidad de construcción para pruebas y clientes antiguos. */
     public ExpenseResponse(
@@ -24,7 +31,19 @@ public record ExpenseResponse(
             LocalDate date,
             String description,
             String paymentMethod) {
-        this(id, amount, category, date, description, paymentMethod, null);
+        this(id, amount, category, date, description, paymentMethod, null, null, false);
+    }
+
+    /** Conserva compatibilidad con la versión que agregó grupos. */
+    public ExpenseResponse(
+            UUID id,
+            BigDecimal amount,
+            String category,
+            LocalDate date,
+            String description,
+            String paymentMethod,
+            UUID groupId) {
+        this(id, amount, category, date, description, paymentMethod, groupId, null, false);
     }
 
     public static ExpenseResponse from(Expense expense) {
@@ -35,6 +54,8 @@ public record ExpenseResponse(
                 expense.getDate(),
                 expense.getDescription(),
                 expense.getPaymentMethod(),
-                expense.getExpenseGroup() == null ? null : expense.getExpenseGroup().getId());
+                expense.getExpenseGroup() == null ? null : expense.getExpenseGroup().getId(),
+                expense.getProject() == null ? null : expense.getProject().getId(),
+                expense.isGenerated());
     }
 }

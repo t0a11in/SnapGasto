@@ -112,3 +112,36 @@ promueve a `ADMIN` una cuenta que ya existe al iniciar la API, y también da
 
 `JWT_SECRET` es obligatorio y no tiene valor por defecto: sin él la API no
 arranca. `.env` está en `.gitignore`; nunca debe subirse al repositorio.
+
+## Proyectos (gastos futuros)
+
+Migración `V6__create_projects.sql`. Tipos: `COMPRA` (compra planificada),
+`RECURRENTE` (arriendo, suscripciones) y `AHORRO` (metas con aportes y retiros).
+
+| Método | Ruta (`/api/projects`) | Uso |
+| --- | --- | --- |
+| GET | `/v1/listar?type=&status=` | Proyectos con valores calculados (ahorrado, faltante, aporte sugerido, próxima fecha). |
+| GET | `/v1/{id}` | Detalle. |
+| POST | `/v1/crear` | Crear. |
+| PUT | `/v1/{id}/actualizar` | Actualizar (el tipo no se puede cambiar). |
+| DELETE | `/v1/{id}/eliminar` | Eliminar; los gastos ya registrados se conservan sin proyecto. |
+| GET / POST | `/v1/{id}/movimientos` | Aportes y retiros de un ahorro (un retiro no puede superar lo ahorrado). |
+| DELETE | `/v1/{id}/movimientos/{movId}` | Eliminar un movimiento. |
+| POST | `/v1/{id}/concretar` | "Lo compré": crea el gasto real y cierra la compra. |
+| POST / DELETE | `/v1/{id}/omitir?month=AAAA-MM` | Omitir (o volver a incluir) un mes de un recurrente. |
+| GET | `/v1/{id}/gastos` | Gastos registrados desde el proyecto. |
+| GET | `/v1/compromisos?month=AAAA-MM` | Lo comprometido del mes; `pending` es lo que aún falta salir. |
+| GET | `/v1/proyeccion?from=AAAA-MM&months=12` | Comprometido por mes (máximo 24). |
+| GET | `/v1/ahorro/resumen?month=AAAA-MM` | Total ahorrado acumulado y aportes/retiros del mes. |
+
+Administración: `/api/admin/projects` (GET, GET `/{id}`, PUT o PATCH `/{id}`, DELETE `/{id}`).
+
+Notificaciones del usuario: `GET /api/notifications/v1/mias[?soloNoLeidas=true]`,
+`GET /api/notifications/v1/no-leidas/cantidad`, `PATCH /api/notifications/v1/{id}/leida`
+y `PATCH /api/notifications/v1/leer-todas`.
+
+La tarea diaria (`PROJECTS_DAILY_CRON`, 06:00 por defecto, zona `APP_TIME_ZONE`)
+registra los gastos recurrentes en su día (con `projectId` y `generated: true`),
+recupera las ocurrencias perdidas si la API estuvo detenida, nunca genera gastos
+anteriores a la creación del proyecto y avisa `notifyDaysBefore` días antes.
+También recuerda las compras cuya fecha objetivo se acerca.

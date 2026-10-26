@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { MoneyPipe, Percent1Pipe } from '../../pipes/money.pipe';
-import { IconComponent } from '../../icons/icon.component';
+import { IconComponent } from '../icon/icon.component';
 
 /** Diferencia del mes: ingresos − gastos, con la proporción gastada. */
 @Component({

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
-import { FieldErrorsComponent } from '../field-errors.component';
+import { FieldErrorsComponent } from '../field-errors/field-errors.component';
 
 let nextId = 0;
 

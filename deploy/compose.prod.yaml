@@ -1,0 +1,87 @@
+# Producción de SnapGasto. Lo copia y ejecuta el pipeline (.github/workflows/production.yml)
+# en el servidor, dentro de la carpeta definida en PROD_DEPLOY_PATH.
+# Las variables vienen del archivo .env que vive SOLO en el servidor (ver .env.example).
+name: snapgasto
+
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: ${MSSQL_PID:-Express}
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en deploy/.env}
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q \"SELECT 1\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    restart: unless-stopped
+    # Sin "ports": la base no queda expuesta a internet, solo a la red interna.
+
+  # Crea la base si no existe. Las tablas las crea Flyway al iniciar la API.
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME:-snap_gastos}
+    entrypoint: ["/bin/bash", "-c"]
+    command: >-
+      /opt/mssql-tools18/bin/sqlcmd -C -S db -U sa -P "$$MSSQL_SA_PASSWORD"
+      -Q "IF DB_ID(N'$$DB_NAME') IS NULL CREATE DATABASE [$$DB_NAME];"
+    restart: "no"
+
+  api:
+    image: ${IMAGE_PREFIX:-ghcr.io/t0a11in}/snapgasto-api:${IMAGE_TAG:-latest}
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: db
+      DB_PORT: 1433
+      DB_NAME: ${DB_NAME:-snap_gastos}
+      DB_USER: sa
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_ENCRYPT: "true"
+      DB_TRUST_SERVER_CERTIFICATE: "true"
+      JWT_SECRET: ${JWT_SECRET:?Define JWT_SECRET en deploy/.env}
+      JWT_EXPIRATION_MINUTES: ${JWT_EXPIRATION_MINUTES:-120}
+      JWT_MAX_SESSION_HOURS: ${JWT_MAX_SESSION_HOURS:-168}
+      APP_BOOTSTRAP_ADMIN_EMAIL: ${APP_BOOTSTRAP_ADMIN_EMAIL:-}
+      CORS_ALLOWED_ORIGINS: https://${DOMAIN:?Define DOMAIN en deploy/.env}
+      SERVER_FORWARD_HEADERS_STRATEGY: native
+    restart: unless-stopped
+
+  web:
+    image: ${IMAGE_PREFIX:-ghcr.io/t0a11in}/snapgasto-web:${IMAGE_TAG:-latest}
+    environment:
+      PORT: 4000
+    restart: unless-stopped
+
+  # Único servicio expuesto: HTTPS automático (Let's Encrypt) y enrutamiento.
+  proxy:
+    image: caddy:2-alpine
+    depends_on:
+      - api
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    restart: unless-stopped
+
+volumes:
+  sqlserver-data:
+  caddy-data:
+  caddy-config:

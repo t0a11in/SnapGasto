@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ExpenseResponse, PAYMENT_METHODS } from '../../../../core/models';
-import { IconComponent } from '../../../../shared/icons/icon.component';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 
 const PM_LABELS = new Map<string, string>(PAYMENT_METHODS.map((p) => [p.value, p.label]));

@@ -5,9 +5,9 @@ import feather from 'feather-icons';
 import { firstValueFrom } from 'rxjs';
 import { errorMessage } from '../../../core/http/error.utils';
 import { CategoryRequest, CategoryResponse } from '../../../core/models';
-import { FieldErrorsComponent } from '../../../shared/components/field-errors.component';
+import { FieldErrorsComponent } from '../../../shared/components/field-errors/field-errors.component';
 import { optionalText } from '../../../shared/forms/common-validators';
-import { IconComponent } from '../../../shared/icons/icon.component';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { AdminResourceStore } from '../shared/admin-resource.store';
 
 interface CategoryFormModel {

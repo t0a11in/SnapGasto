@@ -7,7 +7,7 @@ import { ExpenseResponse, PAYMENT_METHODS, PaymentMethod } from '../../../core/m
 import { defaultDateForMonth, todayIso } from '../../../core/utils/date.utils';
 import { CategoryAutocompleteComponent } from '../../../shared/components/category-autocomplete/category-autocomplete.component';
 import { MoneyPipe } from '../../../shared/pipes/money.pipe';
-import { FieldErrorsComponent } from '../../../shared/components/field-errors.component';
+import { FieldErrorsComponent } from '../../../shared/components/field-errors/field-errors.component';
 import { notFutureDate, optionalText, positiveAmount } from '../../../shared/forms/common-validators';
 import { ExpensesStore } from '../expenses.store';
 

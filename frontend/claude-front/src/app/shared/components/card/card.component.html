@@ -1,0 +1,52 @@
+<section [class]="cardClasses()" [attr.aria-labelledby]="title() ? titleId : null">
+  @if (hasHeader()) {
+    <header class="sg-card__header">
+      @if (icon()) {
+        <span class="sg-card__icon bg-{{ tone() }}-subtle text-{{ tone() }}-emphasis" aria-hidden="true">
+          <app-icon [name]="icon()" [size]="18" />
+        </span>
+      }
+      <div class="sg-card__titles">
+        @if (title()) {
+          <div class="sg-card__title" role="heading" [attr.aria-level]="headingLevel()" [id]="titleId">
+            {{ title() }}
+          </div>
+        }
+        @if (subtitle()) {
+          <div class="sg-card__subtitle">{{ subtitle() }}</div>
+        }
+      </div>
+      <div class="sg-card__actions">
+        <ng-content select="[cardActions]" />
+        @if (collapsible()) {
+          <button
+            appIconButton
+            size="sm"
+            [icon]="collapsed() ? 'chevron-down' : 'chevron-up'"
+            [label]="collapsed() ? 'Expandir' : 'Contraer'"
+            [attr.aria-expanded]="!collapsed()"
+            [attr.aria-controls]="bodyId"
+            (click)="toggle()"
+          ></button>
+        }
+      </div>
+    </header>
+  }
+
+  <div [id]="bodyId" [class]="bodyClasses()" [hidden]="collapsed()" [attr.aria-busy]="loading() ? 'true' : null">
+    <ng-content />
+    @if (loading()) {
+      <div class="sg-card__loading">
+        <span class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando…</span>
+        </span>
+      </div>
+    }
+  </div>
+
+  @if (hasFooter() && !collapsed()) {
+    <footer class="card-footer sg-card__footer">
+      <ng-content select="[cardFooter]" />
+    </footer>
+  }
+</section>

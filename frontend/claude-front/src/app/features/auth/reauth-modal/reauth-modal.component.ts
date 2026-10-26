@@ -5,7 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { errorMessage } from '../../../core/http/error.utils';
 import { AuthService } from '../../../core/services/auth.service';
 import { SessionStore } from '../../../core/state/session.store';
-import { PasswordInputComponent } from '../../../shared/components/password-input.component';
+import { PasswordInputComponent } from '../../../shared/components/password-input/password-input.component';
 
 /**
  * Modal de sesión expirada (HTTP 419). Pide solo la contraseña; el correo sale de

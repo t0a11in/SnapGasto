@@ -1,0 +1,9 @@
+@if (loading()) {
+  <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+} @else if (icon() && iconPosition() === 'start') {
+  <app-icon [library]="iconLibrary()" [name]="icon()" [size]="iconSize()" />
+}
+<ng-content />
+@if (!loading() && icon() && iconPosition() === 'end') {
+  <app-icon [library]="iconLibrary()" [name]="icon()" [size]="iconSize()" />
+}

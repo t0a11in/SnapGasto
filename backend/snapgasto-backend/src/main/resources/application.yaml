@@ -26,6 +26,11 @@ server:
     include-message: never
 
 app:
+  # Zona horaria de negocio: define "hoy" y "este mes" para los proyectos.
+  time-zone: ${APP_TIME_ZONE:America/Santiago}
+  projects:
+    # Tarea diaria: registra gastos recurrentes y envía avisos previos (06:00).
+    daily-cron: ${PROJECTS_DAILY_CRON:0 0 6 * * *}
   bootstrap:
     admin-email: ${APP_BOOTSTRAP_ADMIN_EMAIL:}
   firebase:

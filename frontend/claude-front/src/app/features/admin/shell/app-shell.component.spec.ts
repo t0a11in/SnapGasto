@@ -38,4 +38,13 @@ describe('AppShellComponent', () => {
     }
     expect(el.querySelector('.avatar')?.textContent?.trim()).toBe('AR');
   });
+
+  it('muestra el acceso a las galerías de íconos', async () => {
+    TestBed.inject(SessionStore).setSession(authFixture({ role: 'USER' }));
+    const el = await render();
+    const links = Array.from(el.querySelectorAll<HTMLAnchorElement>('a.nav-link')).map((a) => a.getAttribute('href'));
+    for (const lib of ['feather', 'lucide', 'tabler', 'bootstrap']) {
+      expect(links).toContain(`/ui/icons/${lib}`);
+    }
+  });
 });

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ToastHostComponent } from './shared/components/toast-host.component';
+import { ToastHostComponent } from './shared/components/toast-host/toast-host.component';
 
 @Component({
   imports: [RouterOutlet, ToastHostComponent],

@@ -65,3 +65,15 @@ body {
 .app-icon svg {
   display: block;
 }
+
+/* Botón "ghost" (appButton / appIconButton con appearance="ghost"): sin fondo ni borde. */
+.btn.sg-btn-ghost {
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: transparent;
+  --bs-btn-hover-bg: var(--bs-tertiary-bg);
+  --bs-btn-hover-border-color: transparent;
+  --bs-btn-active-bg: var(--bs-secondary-bg);
+  --bs-btn-active-border-color: transparent;
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: transparent;
+}

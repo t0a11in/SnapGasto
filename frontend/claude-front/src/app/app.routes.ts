@@ -2,6 +2,10 @@ import { Routes } from '@angular/router';
 import { adminGuard, authGuard, guestGuard } from './core/guards/auth.guards';
 import { AppShellComponent } from './features/admin/shell/app-shell.component';
 
+/** Galería de íconos: una sola página que recibe la librería desde `data`. */
+const iconGallery = () =>
+  import('./shared/components/icon-gallery/icon-gallery.component').then((m) => m.IconGalleryComponent);
+
 export const routes: Routes = [
   {
     path: 'login',
@@ -31,6 +35,36 @@ export const routes: Routes = [
         path: 'expenses',
         title: 'Gastos · SnapGasto',
         loadComponent: () => import('./features/expenses/expenses.page').then((m) => m.ExpensesPage),
+      },
+      {
+        path: 'ui/icons',
+        children: [
+          { path: '', pathMatch: 'full', redirectTo: 'feather' },
+          {
+            path: 'feather',
+            title: 'Íconos Feather · SnapGasto',
+            data: { library: 'feather' },
+            loadComponent: iconGallery,
+          },
+          {
+            path: 'lucide',
+            title: 'Íconos Lucide · SnapGasto',
+            data: { library: 'lucide' },
+            loadComponent: iconGallery,
+          },
+          {
+            path: 'tabler',
+            title: 'Íconos Tabler · SnapGasto',
+            data: { library: 'tabler' },
+            loadComponent: iconGallery,
+          },
+          {
+            path: 'bootstrap',
+            title: 'Bootstrap Icons · SnapGasto',
+            data: { library: 'bootstrap' },
+            loadComponent: iconGallery,
+          },
+        ],
       },
       {
         path: 'admin',

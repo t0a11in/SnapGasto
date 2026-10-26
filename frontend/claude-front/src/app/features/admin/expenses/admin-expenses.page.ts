@@ -11,9 +11,9 @@ import {
   AdminUsersApiService,
 } from '../../../core/services/admin-api.services';
 import { sumAmounts } from '../../../core/utils/money.utils';
-import { ConfirmService } from '../../../shared/components/confirm.service';
-import { ToastService } from '../../../shared/components/toast.service';
-import { IconComponent } from '../../../shared/icons/icon.component';
+import { ConfirmService } from '../../../shared/services/confirm.service';
+import { ToastService } from '../../../shared/services/toast.service';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { AdminPageHeaderComponent } from '../shared/admin-page-header.component';
 import { AdminResourceStore } from '../shared/admin-resource.store';
 import { TableStateComponent } from '../shared/table-state.component';

@@ -3,9 +3,12 @@ package cl.snapgasto.backend.exception;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 
 import cl.snapgasto.backend.dto.ApiError;
@@ -35,6 +38,23 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                 .header(HttpHeaders.RETRY_AFTER, Long.toString(exception.getRetryAfterSeconds()))
                 .body(new ApiError(exception.getMessage()));
+    }
+
+    /** Parámetro de URL con formato inválido (UUID, enum, número). */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    ResponseEntity<ApiError> handleTypeMismatch(MethodArgumentTypeMismatchException exception) {
+        return ResponseEntity.badRequest().body(new ApiError("El parámetro '" + exception.getName() + "' no es válido."));
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    ResponseEntity<ApiError> handleMissingParameter(MissingServletRequestParameterException exception) {
+        return ResponseEntity.badRequest().body(new ApiError("Falta el parámetro '" + exception.getParameterName() + "'."));
+    }
+
+    /** Cuerpo JSON ilegible: valor de enum desconocido, fecha mal escrita, etc. */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    ResponseEntity<ApiError> handleUnreadable(HttpMessageNotReadableException exception) {
+        return ResponseEntity.badRequest().body(new ApiError("El cuerpo de la solicitud tiene un formato inválido."));
     }
 
     @ExceptionHandler(Exception.class)

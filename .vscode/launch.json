@@ -100,6 +100,30 @@
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"
+        },
+        {
+            "name": "Flutter · Claude (depurar)",
+            "type": "dart",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/frontend/claude_flutter",
+            "program": "${workspaceFolder}/frontend/claude_flutter/lib/main.dart",
+            "flutterMode": "debug"
+        },
+        {
+            "name": "Flutter · Claude (perfil)",
+            "type": "dart",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/frontend/claude_flutter",
+            "program": "${workspaceFolder}/frontend/claude_flutter/lib/main.dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "Flutter · Claude (release)",
+            "type": "dart",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/frontend/claude_flutter",
+            "program": "${workspaceFolder}/frontend/claude_flutter/lib/main.dart",
+            "flutterMode": "release"
         }
     ]
 }

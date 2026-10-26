@@ -1,0 +1,21 @@
+# Un solo dominio: /api/* va al backend y el resto al front.
+# Caddy obtiene y renueva el certificado HTTPS solo (el DNS de DOMAIN debe
+# apuntar a este servidor y los puertos 80 y 443 deben estar abiertos).
+{$DOMAIN} {
+	encode zstd gzip
+
+	handle /api/* {
+		reverse_proxy api:8080
+	}
+
+	handle {
+		reverse_proxy web:4000
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+}

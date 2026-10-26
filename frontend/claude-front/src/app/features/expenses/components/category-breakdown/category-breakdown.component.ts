@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { MoneyPipe, Percent1Pipe } from '../../../../shared/pipes/money.pipe';
-import { IconComponent } from '../../../../shared/icons/icon.component';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { CategoryTotal } from '../../expenses.store';
 
 /** Alto fijo de cada fila (rem): permite calcular cuántas filas se ven antes del scroll. */

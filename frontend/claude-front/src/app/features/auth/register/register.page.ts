@@ -4,8 +4,8 @@ import { FormField, apply, form, submit, validate } from '@angular/forms/signals
 import { firstValueFrom } from 'rxjs';
 import { errorMessage } from '../../../core/http/error.utils';
 import { AuthService } from '../../../core/services/auth.service';
-import { FieldErrorsComponent } from '../../../shared/components/field-errors.component';
-import { PasswordInputComponent } from '../../../shared/components/password-input.component';
+import { FieldErrorsComponent } from '../../../shared/components/field-errors/field-errors.component';
+import { PasswordInputComponent } from '../../../shared/components/password-input/password-input.component';
 import { AuthLayoutComponent } from '../auth-layout/auth-layout.component';
 import { PASSWORD_MIN, RegisterModel, registerSchema } from '../auth.schemas';
 

@@ -47,6 +47,17 @@
       }
     </ul>
 
+    <div class="nav-section mt-3">Íconos</div>
+    <ul class="nav flex-column">
+      @for (item of uiNav; track item.link) {
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="item.link" routerLinkActive="active" ariaCurrentWhenActive="page">
+            <app-icon [library]="item.iconLibrary ?? 'feather'" [name]="item.icon" /> {{ item.label }}
+          </a>
+        </li>
+      }
+    </ul>
+
     @if (adminNav().length) {
       <div class="nav-section mt-3">Administración</div>
       <ul class="nav flex-column">

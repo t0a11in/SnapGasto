@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { IconComponent } from '../../../shared/icons/icon.component';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
 
 /** Contenedor visual compartido por login y registro. */
 @Component({

@@ -4,7 +4,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { firstValueFrom } from 'rxjs';
 import { errorMessage } from '../../../core/http/error.utils';
 import { AdminUserResponse, NotificationRequest, NotificationResponse } from '../../../core/models';
-import { FieldErrorsComponent } from '../../../shared/components/field-errors.component';
+import { FieldErrorsComponent } from '../../../shared/components/field-errors/field-errors.component';
 import { AdminResourceStore } from '../shared/admin-resource.store';
 
 @Component({

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, model } from '@angular/core';
-import { isValidMonth, shiftMonth } from '../../core/utils/date.utils';
-import { IconComponent } from '../icons/icon.component';
+import { isValidMonth, shiftMonth } from '../../../core/utils/date.utils';
+import { IconComponent } from '../icon/icon.component';
 
 /** Selector de mes YYYY-MM con navegación anterior/siguiente. */
 @Component({

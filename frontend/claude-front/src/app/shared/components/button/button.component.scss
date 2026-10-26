@@ -1,0 +1,10 @@
+:host.sg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+:host.sg-btn.w-100 {
+  display: flex;
+}

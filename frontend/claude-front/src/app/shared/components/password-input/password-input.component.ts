@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
-import { IconComponent } from '../icons/icon.component';
-import { FieldErrorsComponent } from './field-errors.component';
+import { IconComponent } from '../icon/icon.component';
+import { FieldErrorsComponent } from '../field-errors/field-errors.component';
 
 let nextId = 0;
 

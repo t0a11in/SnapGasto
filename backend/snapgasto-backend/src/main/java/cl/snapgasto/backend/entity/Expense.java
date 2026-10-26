@@ -55,6 +55,15 @@ public class Expense {
     @JoinColumn(name = "group_id")
     private ExpenseGroup expenseGroup;
 
+    /** Proyecto que originó el gasto (recurrente generado o compra concretada). Nulo si es manual. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
+    private Project project;
+
+    /** true si lo registró automáticamente un gasto recurrente. */
+    @Column(name = "is_generated", nullable = false)
+    private boolean generated;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

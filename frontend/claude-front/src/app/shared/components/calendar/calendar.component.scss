@@ -1,0 +1,48 @@
+:host {
+  display: inline-block;
+  max-width: 100%;
+}
+
+.sg-calendar {
+  border-radius: 0.75rem;
+}
+
+.sg-calendar__day {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  font-variant-numeric: tabular-nums;
+
+  &.is-focused {
+    background: var(--bs-tertiary-bg);
+  }
+
+  &.is-selected {
+    background: var(--bs-primary);
+    color: #fff;
+  }
+
+  &.is-disabled {
+    color: var(--bs-secondary-color);
+    opacity: 0.5;
+  }
+}
+
+.sg-calendar__mark {
+  position: absolute;
+  bottom: 0.2rem;
+  left: 50%;
+  width: 0.25rem;
+  height: 0.25rem;
+  border-radius: 50%;
+  background: var(--bs-primary);
+  transform: translateX(-50%);
+}
+
+.is-selected .sg-calendar__mark {
+  background: #fff;
+}

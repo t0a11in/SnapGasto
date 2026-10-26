@@ -1,0 +1,28 @@
+<ngb-datepicker
+  class="sg-calendar"
+  navigation="select"
+  outsideDays="collapsed"
+  [attr.aria-label]="label()"
+  [displayMonths]="displayMonths()"
+  [minDate]="minDate()!"
+  [maxDate]="maxDate()!"
+  [dayTemplate]="day"
+  [ngModel]="selected()"
+  [ngModelOptions]="{ standalone: true }"
+  (ngModelChange)="onSelect($event)"
+  [disabled]="disabled()"
+/>
+
+<ng-template #day let-date let-selected="selected" let-disabled="disabled" let-focused="focused">
+  <span
+    class="sg-calendar__day"
+    [class.is-selected]="selected"
+    [class.is-focused]="focused"
+    [class.is-disabled]="disabled"
+  >
+    {{ date.day }}
+    @if (isMarked(date)) {
+      <span class="sg-calendar__mark" aria-hidden="true"></span>
+    }
+  </span>
+</ng-template>

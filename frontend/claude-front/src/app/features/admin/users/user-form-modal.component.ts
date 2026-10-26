@@ -4,8 +4,8 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { firstValueFrom } from 'rxjs';
 import { errorMessage } from '../../../core/http/error.utils';
 import { AdminUserRequest, AdminUserResponse, Role } from '../../../core/models';
-import { FieldErrorsComponent } from '../../../shared/components/field-errors.component';
-import { PasswordInputComponent } from '../../../shared/components/password-input.component';
+import { FieldErrorsComponent } from '../../../shared/components/field-errors/field-errors.component';
+import { PasswordInputComponent } from '../../../shared/components/password-input/password-input.component';
 import { AdminResourceStore } from '../shared/admin-resource.store';
 
 interface UserFormModel {

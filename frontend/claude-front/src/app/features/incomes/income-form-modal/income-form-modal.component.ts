@@ -6,7 +6,7 @@ import { errorMessage } from '../../../core/http/error.utils';
 import { INCOME_TYPES, IncomeResponse, IncomeType } from '../../../core/models';
 import { defaultDateForMonth, todayIso } from '../../../core/utils/date.utils';
 import { MoneyPipe } from '../../../shared/pipes/money.pipe';
-import { FieldErrorsComponent } from '../../../shared/components/field-errors.component';
+import { FieldErrorsComponent } from '../../../shared/components/field-errors/field-errors.component';
 import { notFutureDate, optionalText, positiveAmount } from '../../../shared/forms/common-validators';
 import { IncomesStore } from '../incomes.store';
 

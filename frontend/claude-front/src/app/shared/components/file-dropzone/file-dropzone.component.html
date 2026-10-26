@@ -1,0 +1,78 @@
+@if (label()) {
+  <div class="form-label" [id]="labelId">
+    {{ label() }}
+    @if (required()) {
+      <span class="text-danger" aria-hidden="true">*</span>
+    }
+  </div>
+}
+
+<div
+  class="sg-dropzone"
+  role="button"
+  [class.is-dragging]="dragging()"
+  [class.is-disabled]="disabled()"
+  [class.is-invalid]="messages().length > 0"
+  [attr.tabindex]="disabled() ? -1 : 0"
+  [attr.aria-disabled]="disabled() ? 'true' : null"
+  [attr.aria-labelledby]="label() ? labelId : null"
+  [attr.aria-label]="label() ? null : 'Agregar archivos'"
+  [attr.aria-describedby]="describedBy()"
+  (click)="openPicker()"
+  (keydown)="onKeydown($event)"
+  (blur)="touch.emit()"
+  (dragenter)="onDragEnter($event)"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave()"
+  (drop)="onDrop($event)"
+>
+  <app-icon name="upload-cloud" [size]="28" class="sg-dropzone__icon" />
+  <div class="sg-dropzone__text">
+    @if (dragging()) {
+      Suelta los archivos aquí
+    } @else {
+      Arrastra {{ multiple() ? 'archivos' : 'un archivo' }} aquí o <span class="sg-dropzone__link">búscalo en tu equipo</span>
+    }
+  </div>
+  <div class="form-text mt-1" [id]="hintId">{{ hint() || limitsText() }}</div>
+</div>
+
+<input
+  #fileInput
+  type="file"
+  class="visually-hidden"
+  tabindex="-1"
+  aria-hidden="true"
+  [attr.accept]="accept() || null"
+  [multiple]="multiple()"
+  [disabled]="disabled()"
+  (change)="onFileInputChange($event)"
+/>
+
+@if (messages().length) {
+  <div class="invalid-feedback d-block" [id]="errorId" role="alert">
+    @for (msg of messages(); track $index) {
+      <div>{{ msg }}</div>
+    }
+  </div>
+}
+
+@if (items().length) {
+  <ul class="sg-dropzone__list" aria-label="Archivos seleccionados">
+    @for (item of items(); track item.key) {
+      <li class="sg-dropzone__item">
+        <app-icon [name]="item.icon" [size]="18" class="text-body-secondary" />
+        <span class="sg-dropzone__name" [title]="item.file.name">{{ item.file.name }}</span>
+        <span class="sg-dropzone__size">{{ item.size }}</span>
+        <button
+          appIconButton
+          icon="x"
+          size="sm"
+          [label]="'Quitar ' + item.file.name"
+          [disabled]="disabled()"
+          (click)="remove(item.key)"
+        ></button>
+      </li>
+    }
+  </ul>
+}

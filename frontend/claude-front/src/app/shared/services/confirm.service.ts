@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmDialogComponent, ConfirmOptions } from './confirm-dialog.component';
+import { ConfirmDialogComponent, ConfirmOptions } from '../components/confirm-dialog/confirm-dialog.component';
 
 @Injectable({ providedIn: 'root' })
 export class ConfirmService {

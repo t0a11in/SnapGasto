@@ -88,13 +88,17 @@ tr:hover td { background: #f8fafc; }
 .month-toolbar { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 20px; padding: 16px; border: 1px solid #e2e8f0; border-radius: 12px; background: rgb(255 255 255 / 78%); }
 .month-field { width: min(100%, 230px); }
 .income-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 20px; }
+.expense-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 20px; }
 .summary-card { display: grid; gap: 8px; padding: 18px; border: 1px solid #dbeafe; border-radius: 12px; color: #1e3a8a; background: #eff6ff; }
 .summary-card span { font-size: .8rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
 .summary-card strong { color: #0f172a; font-size: clamp(1.2rem, 3vw, 1.7rem); letter-spacing: -.03em; }
 .summary-total { border-color: #bfdbfe; background: #dbeafe; }
+.expense-summary-total { border-color: #fecaca; color: #991b1b; background: #fef2f2; }
 .income-type { display: inline-block; padding: 4px 8px; border-radius: 999px; color: #166534; background: #dcfce7; font-size: .75rem; font-weight: 800; }
 .income-type-card { color: #1d4ed8; background: #dbeafe; }
+.expense-category { display: inline-block; padding: 4px 8px; border-radius: 999px; color: #9a3412; background: #ffedd5; font-size: .75rem; font-weight: 800; }
 .income-modal { width: min(100%, 560px); }
+.expense-modal { width: min(100%, 620px); }
 .field em { color: #64748b; font-size: .78rem; font-style: normal; font-weight: 400; }
 
 @media (max-width: 800px) {
@@ -111,6 +115,7 @@ tr:hover td { background: #f8fafc; }
   .income-topbar { padding-inline: 16px; }
   .income-content { padding: 28px 16px 44px; }
   .income-summary { grid-template-columns: 1fr; }
+  .expense-summary { grid-template-columns: 1fr; }
   .page-header { align-items: center; margin-bottom: 22px; }
   .form-grid { grid-template-columns: 1fr; }
   .field-wide, .checkbox-field { grid-column: auto; }

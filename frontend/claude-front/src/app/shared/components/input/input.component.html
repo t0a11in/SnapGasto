@@ -1,0 +1,90 @@
+@if (label()) {
+  <label class="form-label" [for]="inputId">
+    {{ label() }}
+    @if (required()) {
+      <span class="text-danger" aria-hidden="true">*</span>
+    }
+  </label>
+}
+
+@if (hasAddons()) {
+  <div class="input-group" [class.has-validation]="showErrors()">
+    @if (icon()) {
+      <span class="input-group-text"><app-icon [name]="icon()" [size]="16" /></span>
+    }
+    <ng-container [ngTemplateOutlet]="field" />
+    @if (suffix()) {
+      <span class="input-group-text">{{ suffix() }}</span>
+    }
+  </div>
+} @else {
+  <ng-container [ngTemplateOutlet]="field" />
+}
+
+<div class="sg-input__below">
+  <div class="sg-input__messages">
+    @if (showErrors()) {
+      <div class="invalid-feedback d-block" [id]="errorId" role="alert">
+        @for (msg of messages(); track msg) {
+          <div>{{ msg }}</div>
+        }
+      </div>
+    }
+    @if (hint()) {
+      <div class="form-text" [id]="hintId">{{ hint() }}</div>
+    }
+  </div>
+  @if (showCounter() && maxLength()) {
+    <div class="form-text sg-input__counter" [class.text-danger]="length() > maxLength()!" aria-live="polite">
+      {{ length() }} / {{ maxLength() }}
+    </div>
+  }
+</div>
+
+<ng-template #field>
+  @if (isTextarea()) {
+    <textarea
+      #control
+      class="form-control"
+      [id]="inputId"
+      [rows]="rows()"
+      [attr.name]="name() || null"
+      [attr.placeholder]="placeholder() || null"
+      [attr.autocomplete]="autocomplete()"
+      [attr.maxlength]="maxLength() ?? null"
+      [attr.minlength]="minLength() ?? null"
+      [disabled]="disabled()"
+      [readOnly]="readonly()"
+      [required]="required()"
+      [class.is-invalid]="showErrors()"
+      [attr.aria-invalid]="showErrors() ? 'true' : null"
+      [attr.aria-describedby]="describedBy()"
+      (input)="onInput($event)"
+      (blur)="onBlur()"
+    ></textarea>
+  } @else {
+    <input
+      #control
+      class="form-control"
+      [id]="inputId"
+      [type]="type()"
+      [attr.name]="name() || null"
+      [attr.placeholder]="placeholder() || null"
+      [attr.autocomplete]="autocomplete()"
+      [attr.inputmode]="inputMode()"
+      [attr.step]="step()"
+      [attr.min]="min() ?? null"
+      [attr.max]="max() ?? null"
+      [attr.maxlength]="maxLength() ?? null"
+      [attr.minlength]="minLength() ?? null"
+      [disabled]="disabled()"
+      [readOnly]="readonly()"
+      [required]="required()"
+      [class.is-invalid]="showErrors()"
+      [attr.aria-invalid]="showErrors() ? 'true' : null"
+      [attr.aria-describedby]="describedBy()"
+      (input)="onInput($event)"
+      (blur)="onBlur()"
+    />
+  }
+</ng-template>

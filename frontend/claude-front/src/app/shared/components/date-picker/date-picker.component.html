@@ -1,0 +1,52 @@
+@if (label()) {
+  <label class="form-label" [for]="inputId">
+    {{ label() }}
+    @if (required()) {
+      <span class="text-danger" aria-hidden="true">*</span>
+    }
+  </label>
+}
+<div class="input-group" [class.has-validation]="showErrors()">
+  <input
+    #control
+    #picker="ngbDatepicker"
+    ngbDatepicker
+    class="form-control"
+    autocomplete="off"
+    inputmode="numeric"
+    [id]="inputId"
+    [attr.name]="name() || null"
+    [placeholder]="placeholder()"
+    [ngModel]="viewDate()"
+    [ngModelOptions]="{ standalone: true }"
+    (ngModelChange)="onPickerChange($event)"
+    [minDate]="minDate()!"
+    [maxDate]="maxDate()!"
+    [disabled]="disabled()"
+    [readOnly]="readonly()"
+    [required]="required()"
+    [class.is-invalid]="showErrors()"
+    [attr.aria-invalid]="showErrors() ? 'true' : null"
+    [attr.aria-describedby]="describedBy()"
+    (blur)="onBlur()"
+  />
+  <button
+    appIconButton
+    icon="calendar"
+    label="Abrir calendario"
+    appearance="outline"
+    [disabled]="disabled() || readonly()"
+    [attr.aria-controls]="inputId"
+    (click)="picker.toggle()"
+  ></button>
+</div>
+@if (showErrors()) {
+  <div class="invalid-feedback d-block" [id]="errorId" role="alert">
+    @for (msg of messages(); track msg) {
+      <div>{{ msg }}</div>
+    }
+  </div>
+}
+@if (hint()) {
+  <div class="form-text" [id]="hintId">{{ hint() }}</div>
+}

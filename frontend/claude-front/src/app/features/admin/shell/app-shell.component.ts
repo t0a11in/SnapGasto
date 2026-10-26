@@ -4,17 +4,28 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { SessionStore } from '../../../core/state/session.store';
-import { IconComponent } from '../../../shared/icons/icon.component';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { IconLibrary } from '../../../shared/components/icon/icon-libraries';
 
 interface NavItem {
   label: string;
   link: string;
   icon: string;
+  /** Librería del ícono del menú (Feather si se omite). */
+  iconLibrary?: IconLibrary;
 }
 
 const PERSONAL_NAV: NavItem[] = [
   { label: 'Ingresos', link: '/incomes', icon: 'trending-up' },
   { label: 'Gastos', link: '/expenses', icon: 'trending-down' },
+];
+
+/** Acceso rápido a las galerías de íconos (cada ícono es de su propia librería). */
+const UI_NAV: NavItem[] = [
+  { label: 'Feather', link: '/ui/icons/feather', icon: 'feather' },
+  { label: 'Lucide', link: '/ui/icons/lucide', icon: 'shapes', iconLibrary: 'lucide' },
+  { label: 'Tabler', link: '/ui/icons/tabler', icon: 'icons', iconLibrary: 'tabler' },
+  { label: 'Bootstrap Icons', link: '/ui/icons/bootstrap', icon: 'bootstrap', iconLibrary: 'bootstrap' },
 ];
 
 const ADMIN_NAV: NavItem[] = [
@@ -40,6 +51,7 @@ export class AppShellComponent {
   readonly user = this.session.user;
   readonly isAdmin = this.session.isAdmin;
   readonly personalNav = PERSONAL_NAV;
+  readonly uiNav = UI_NAV;
   readonly adminNav = computed(() => (this.isAdmin() ? ADMIN_NAV : []));
   readonly initials = computed(() =>
     (this.user()?.fullName ?? '?')

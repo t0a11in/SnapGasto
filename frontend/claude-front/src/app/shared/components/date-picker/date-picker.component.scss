@@ -1,0 +1,10 @@
+:host {
+  display: block;
+}
+
+/* El botón del calendario queda unido al campo como parte del input-group. */
+.input-group > .btn {
+  width: 2.75rem;
+  height: auto;
+  border-color: var(--bs-border-color);
+}
