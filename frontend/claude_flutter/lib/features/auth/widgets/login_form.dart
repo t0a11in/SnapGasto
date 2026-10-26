@@ -18,14 +18,14 @@ class LoginForm extends StatefulWidget {
 class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _email;
-  final TextEditingController _password = TextEditingController();
+  final TextEditingController _password = TextEditingController(text:'Cuatico1234*');
   late bool _rememberEmail;
 
   @override
   void initState() {
     super.initState();
     final remembered = context.read<LoginCubit>().rememberedEmail;
-    _email = TextEditingController(text: remembered ?? '');
+    _email = TextEditingController(text: remembered ?? 'test@uno.cl');
     _rememberEmail = remembered != null;
   }
 
